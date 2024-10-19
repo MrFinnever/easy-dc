@@ -1,7 +1,8 @@
-package net.kep.dc_guide.screens
+package net.kep.dc_guide.ui.screens
 
 import androidx.compose.runtime.Composable
 
 @Composable
-fun CalcScreen() {
+fun ResultScreen() {
+
 }

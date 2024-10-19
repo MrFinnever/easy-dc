@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import net.kep.dc_guide.screens.MainScreen
+import androidx.navigation.NavController
+import net.kep.dc_guide.ui.screens.MainScreen
 import net.kep.dc_guide.ui.theme.DCguideTheme
 
 class MainActivity : ComponentActivity() {
