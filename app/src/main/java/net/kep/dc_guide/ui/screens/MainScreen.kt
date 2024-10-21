@@ -30,7 +30,6 @@ fun MainScreen() {
                 CalcNavHost(mainNavCon)
             }
             composable(NavRoutes.Settings.route) { SettingsScreen() }
-
         }
     }
 }
