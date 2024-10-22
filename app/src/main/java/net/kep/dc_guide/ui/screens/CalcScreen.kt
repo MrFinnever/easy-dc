@@ -1,7 +1,5 @@
 package net.kep.dc_guide.ui.screens
 
-import androidx.collection.MutableIntList
-import androidx.collection.mutableIntListOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,8 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 fun CalcScreen(
     calcNavCon: NavController
 ) {
-    val branches = remember { mutableStateListOf(1) }
-    val branchIndex = remember { mutableIntListOf(1) }
+    val branches = remember { mutableStateListOf(Branch(1)) }
 
     Scaffold(
         topBar = {
@@ -52,7 +49,6 @@ fun CalcScreen(
         },
         floatingActionButton = {
             CalcFAB(
-                branchIndex = branchIndex,
                 branches = branches
             )
         }
@@ -61,15 +57,32 @@ fun CalcScreen(
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
+                //Для удобного доступа в самом низу экрана
                 .padding(bottom = 80.dp)
         ) {
-            branches.forEach { index ->
+            branches.forEachIndexed { index, branch ->
                 BranchCard(
-                    branchIndex = branchIndex.last(),
-                    branches = branches,
-                    Modifier
-                        .padding(it)
-                        .padding(vertical = 10.dp, horizontal = 20.dp)
+                    branch = branch,
+                    isRemovable = index > 0,
+                    onRemove = {
+                        if (index > 0) {
+                            branches.removeAt(index)
+                            // Переиндексация оставшихся ветвей
+                            branches.forEachIndexed { i, _ ->
+                                branches[i].id = i + 1
+                            }
+                        }
+                    },
+                    modifier = if (index > 0) {
+                        Modifier
+                            .padding(vertical = 10.dp, horizontal = 20.dp)
+                    }
+                    else {
+                        Modifier
+                            .padding(it)
+                            .padding(vertical = 10.dp, horizontal = 20.dp)
+                    }
+
                 )
             }
         }
@@ -93,7 +106,7 @@ fun CalcTopAppBar(
         },
         actions = {
             IconButton(
-                onClick = { TODO("НАВИГАЦИЯ НА ЭКРАН С СОВЕТОМ") }
+                onClick = { calcNavCon.navigate(route = "advice") }
             ) {
                 Icon(
                     imageVector = Icons.Default.QuestionMark,
@@ -115,38 +128,40 @@ fun CalcTopAppBar(
 }
 
 
+
 @Composable
 fun CalcFAB(
-    branchIndex: MutableIntList,
-    branches: MutableList<Int>
+    branches: SnapshotStateList<Branch>
 ) {
     fun addBranch() {
-        branches.add(branches.size)
-        branchIndex.add(branchIndex.lastIndex + 1)
+        branches.add(
+            Branch(branches.size + 1)
+        )
     }
 
     ExtendedFloatingActionButton(
         onClick = { addBranch() },
         icon = {
             Icon(
-                imageVector =  Icons.Default.Add,
-                contentDescription = "Add a branch"
+                imageVector = Icons.Default.Add,
+                contentDescription = "Добавить ветвь"
             )
         },
         text = {
             Text(
-                text = "Ветвь"
+                text = "Ветвь",
+                fontSize = 22.sp
             )
         }
-
     )
 }
 
 
 @Composable
 fun BranchCard(
-    branchIndex: Int,
-    branches: SnapshotStateList<Int>,
+    branch: Branch,
+    isRemovable: Boolean,
+    onRemove: () -> Unit,
     modifier: Modifier
 ) {
     Card(
@@ -155,41 +170,36 @@ fun BranchCard(
             .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier
-                .padding(vertical = 10.dp, horizontal = 15.dp)
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
         ) {
 
             BranchCardLabel(
-                branchIndex = branchIndex,
-                branches = branches,
-                modifier = Modifier
-                    .fillMaxWidth()
+                branchNumber = branch.id,
+                isRemovable = isRemovable,
+                onRemove = onRemove,
+                modifier = Modifier.fillMaxWidth()
             )
 
             BranchInputOutput(
+                input = branch.input,
+                output = branch.output,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
-
             )
 
-            val resistorsTextFields = remember { mutableStateListOf("") }
-
             BranchMultiComponent(
-                lable = "Резистор",
+                label = "Резистор",
                 placeholder = "Ом",
-                textFields = resistorsTextFields,
+                textFields = branch.resistors,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
             )
-
-            val emfTextFields = remember { mutableStateListOf("") }
-
             BranchMultiComponent(
-                lable = "ЭДС",
+                label = "ЭДС",
                 placeholder = "В",
-                textFields = emfTextFields,
+                textFields = branch.emf,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -201,16 +211,11 @@ fun BranchCard(
 
 @Composable
 fun BranchCardLabel(
-    branchIndex: Int,
-    branches: SnapshotStateList<Int>,
+    branchNumber: Int,
+    isRemovable: Boolean,
+    onRemove: () -> Unit,
     modifier: Modifier
 ) {
-    fun removeBranch() {
-        if (branches.size > 1) {
-            branches.removeAt(branchIndex - 1)
-        }
-    }
-
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -218,21 +223,20 @@ fun BranchCardLabel(
     ) {
 
         Text(
-            text = "Ветвь №$branchIndex",
+            text = "Ветвь №$branchNumber",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        IconButton(
-
-            onClick = {
-                removeBranch()
+        if (isRemovable) {
+            IconButton(
+                onClick = onRemove
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Удалить ветвь"
+                )
             }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete a branch"
-            )
         }
     }
 }
@@ -240,17 +244,15 @@ fun BranchCardLabel(
 
 @Composable
 fun BranchInputOutput(
-    modifier: Modifier
+    input: MutableState<String>,
+    output: MutableState<String>,
+    modifier: Modifier = Modifier
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-
-        val input = remember{mutableStateOf("")}
-        val output = remember{mutableStateOf("")}
-
         OutlinedTextField(
             label = {
                 Text(
@@ -265,18 +267,19 @@ fun BranchInputOutput(
                 )
             },
             shape = MaterialTheme.shapes.medium,
-            value = input.value,
-            onValueChange = { newText ->
-                input.value = newText
-            },
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal
+                keyboardType = KeyboardType.Number
             ),
+            value = input.value,  // Используем значение из состояния
+            onValueChange = { newText ->
+                input.value = newText  // Обновляем состояние
+            },
             maxLines = 1,
             modifier = Modifier
                 .padding(end = 5.dp)
                 .fillMaxWidth(0.49f)
         )
+
         OutlinedTextField(
             label = {
                 Text(
@@ -291,13 +294,13 @@ fun BranchInputOutput(
                 )
             },
             shape = MaterialTheme.shapes.medium,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
             value = output.value,
             onValueChange = { newValue ->
                 output.value = newValue
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
             maxLines = 1,
             modifier = Modifier
                 .padding(start = 5.dp)
@@ -309,25 +312,11 @@ fun BranchInputOutput(
 
 @Composable
 fun BranchMultiComponent(
-    lable: String,
+    label: String,
     placeholder: String,
-    textFields: MutableList<String>,
-    modifier: Modifier
+    textFields: SnapshotStateList<String>,
+    modifier: Modifier = Modifier
 ) {
-    // Функция для добавления нового текстового поля
-    fun addTextField() {
-        textFields.add("")
-    }
-
-    // Функция для удаления последнего текстового поля
-    fun removeLastTextField(
-        index: Int
-    ) {
-        if (textFields.size > 1) {
-            textFields.removeAt(index)
-        }
-    }
-
     Column(
         modifier = modifier
     ) {
@@ -340,7 +329,7 @@ fun BranchMultiComponent(
                 OutlinedTextField(
                     label = {
                         Text(
-                            text = lable,
+                            text = label,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     },
@@ -359,42 +348,33 @@ fun BranchMultiComponent(
                         textFields[index] = newText
                     },
                     maxLines = 1,
-                    modifier = if(index == 0) {
-                        Modifier
-                            .fillMaxWidth()
+                    modifier = if (index == 0) {
+                        Modifier.fillMaxWidth()
+                    } else {
+                        Modifier.fillMaxWidth(0.85f)
                     }
-                            else {
-                        Modifier
-                            .fillMaxWidth(0.85f)
-                    }
-
                 )
 
-                if(index > 0) {
+                if (index > 0) {
                     IconButton(
-                        onClick = { removeLastTextField(index) },
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .fillMaxWidth()
+                        onClick = {
+                            if (textFields.size > 1) textFields.removeAt(index)
+                        },
+                        modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Icon(Icons.Default.RemoveCircle, contentDescription = "Delete")
                     }
                 }
             }
-
-
         }
 
         OutlinedIconButton(
             shape = MaterialTheme.shapes.medium,
-            onClick = {
-                addTextField()
-            },
+            onClick = { textFields.add("") },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add")
         }
-
     }
 }
 
@@ -402,17 +382,13 @@ fun BranchMultiComponent(
 
 
 data class Branch(
-    val input: Int,
-    val emf: Double,
-    val resist: Double,
-    val output: Int
+    var id: Int,
+    var input: MutableState<String> = mutableStateOf(""),
+    var output: MutableState<String> = mutableStateOf(""),
+    var resistors: SnapshotStateList<String> = mutableStateListOf(""),
+    var emf: SnapshotStateList<String> = mutableStateListOf("")
 )
-val branches: List<Branch> = listOf(
-    Branch(1, 2.0, 3.0, 2),
-    Branch(2, 2.5, 3.1, 3),
-    Branch(3, 1.0, 3.3, 4),
-    Branch(4, 3.0, 1.4, 1)
-)
+
 
 
 @Preview
