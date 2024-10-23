@@ -8,11 +8,15 @@ import androidx.navigation.compose.rememberNavController
 import net.kep.dc_guide.ui.screens.AdviceScreen
 import net.kep.dc_guide.ui.screens.CalcScreen
 import net.kep.dc_guide.ui.screens.GreetingScreen
+import net.kep.dc_guide.ui.screens.ResultScreen
+import net.kep.dc_guide.ui.viewmodel.BranchViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun CalcNavHost(
     mainNavCon: NavController
 ) {
+    val branchViewModel: BranchViewModel = viewModel()
     val calcNavCon = rememberNavController()
 
     NavHost(
@@ -26,10 +30,19 @@ fun CalcNavHost(
             )
         }
         composable(NavRoutes.Calculator.route) {
-            CalcScreen(calcNavCon)
+            CalcScreen(
+                branchViewModel,
+                calcNavCon
+            )
         }
         composable(NavRoutes.Advice.route) {
             AdviceScreen(calcNavCon)
+        }
+        composable(NavRoutes.Result.route) {
+            ResultScreen(
+                branchViewModel,
+                calcNavCon
+            )
         }
     }
 }

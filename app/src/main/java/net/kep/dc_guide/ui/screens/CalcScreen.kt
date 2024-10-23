@@ -28,22 +28,25 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DoneOutline
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.viewmodel.compose.viewModel
+import net.kep.dc_guide.data.Branch
+import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
 
 @Composable
 fun CalcScreen(
+    branchViewModel: BranchViewModel = viewModel(),
     calcNavCon: NavController
 ) {
-    val branches = remember { mutableStateListOf(Branch(1)) }
+    val branches by branchViewModel.branches.collectAsState()
+
 
     Scaffold(
         topBar = {
@@ -53,7 +56,7 @@ fun CalcScreen(
         },
         floatingActionButton = {
             ResultButton(
-                branches = branches
+                calcNavCon = calcNavCon
             )
         }
     ) {
@@ -70,11 +73,7 @@ fun CalcScreen(
                     isRemovable = index > 0,
                     onRemove = {
                         if (index > 0) {
-                            branches.removeAt(index)
-                            // Переиндексация оставшихся ветвей
-                            branches.forEachIndexed { i, _ ->
-                                branches[i].id = i + 1
-                            }
+                            branchViewModel.removeBranch(index)
                         }
                     },
                     modifier = if (index > 0) {
@@ -91,7 +90,7 @@ fun CalcScreen(
             }
 
             AddBranchButton(
-                branches = branches,
+                vm = branchViewModel,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -141,9 +140,13 @@ fun CalcTopAppBar(
 
 @Composable
 fun ResultButton(
-    branches: SnapshotStateList<Branch>
+    calcNavCon: NavController
 ) {
-    ExtendedFloatingActionButton(onClick = { /*TODO*/ }) {
+    ExtendedFloatingActionButton(
+        onClick = {
+            calcNavCon.navigate(route = "result")
+        }
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -163,21 +166,16 @@ fun ResultButton(
 
 @Composable
 fun AddBranchButton(
-    branches: SnapshotStateList<Branch>,
+    vm: BranchViewModel,
     modifier: Modifier
 ) {
-    fun addBranch() {
-        branches.add(
-            Branch(branches.size + 1)
-        )
-    }
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         Button(
-            onClick = { addBranch() },
+            onClick = { vm.addBranch() },
             shape = MaterialTheme.shapes.medium,
             content = {
                 Row(
@@ -420,21 +418,13 @@ fun BranchMultiComponent(
 }
 
 
-
-
-data class Branch(
-    var id: Int,
-    var input: MutableState<String> = mutableStateOf(""),
-    var output: MutableState<String> = mutableStateOf(""),
-    var resistors: SnapshotStateList<String> = mutableStateListOf(""),
-    var emf: SnapshotStateList<String> = mutableStateListOf("")
-)
-
-
-
 @Preview
 @Composable
 fun CalcScreenPreview() {
+    val branchViewModel = BranchViewModel()
     val calcNav = rememberNavController()
-    CalcScreen(calcNav)
+    CalcScreen(
+        branchViewModel,
+        calcNav
+    )
 }
