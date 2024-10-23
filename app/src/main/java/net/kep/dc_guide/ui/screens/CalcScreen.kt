@@ -1,6 +1,7 @@
 package net.kep.dc_guide.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +27,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DoneOutline
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,7 +52,7 @@ fun CalcScreen(
             )
         },
         floatingActionButton = {
-            CalcFAB(
+            ResultButton(
                 branches = branches
             )
         }
@@ -85,6 +89,12 @@ fun CalcScreen(
 
                 )
             }
+
+            AddBranchButton(
+                branches = branches,
+                modifier = Modifier.fillMaxWidth()
+            )
+
         }
 
     }
@@ -130,8 +140,31 @@ fun CalcTopAppBar(
 
 
 @Composable
-fun CalcFAB(
+fun ResultButton(
     branches: SnapshotStateList<Branch>
+) {
+    ExtendedFloatingActionButton(onClick = { /*TODO*/ }) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.AutoAwesome,
+                contentDescription = "Make result"
+            )
+            Text(
+                text = "Рассчитать",
+                fontSize = 22.sp,
+                modifier = Modifier.padding(start = 5.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun AddBranchButton(
+    branches: SnapshotStateList<Branch>,
+    modifier: Modifier
 ) {
     fun addBranch() {
         branches.add(
@@ -139,21 +172,29 @@ fun CalcFAB(
         )
     }
 
-    ExtendedFloatingActionButton(
-        onClick = { addBranch() },
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Добавить ветвь"
-            )
-        },
-        text = {
-            Text(
-                text = "Ветвь",
-                fontSize = 22.sp
-            )
-        }
-    )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        Button(
+            onClick = { addBranch() },
+            shape = MaterialTheme.shapes.medium,
+            content = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Добавить ветвь"
+                    )
+                    Text(
+                        text = "Добавить ветвь",
+                        fontSize = 18.sp
+                    )
+                }
+            }
+        )
+    }
 }
 
 
