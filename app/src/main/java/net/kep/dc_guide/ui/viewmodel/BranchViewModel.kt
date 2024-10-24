@@ -17,7 +17,7 @@ class BranchViewModel: ViewModel() {
 
     fun removeBranch(index: Int) {
         if (index > 0 && index < _branches.value.size) {
-            _branches.value.removeAt(index)
+            _branches.value = _branches.value.toMutableList().apply { removeAt(index) }
             reindexBranch()
         }
     }

@@ -187,7 +187,8 @@ fun AddBranchButton(
                     )
                     Text(
                         text = "Добавить ветвь",
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
