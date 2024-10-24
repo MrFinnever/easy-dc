@@ -205,12 +205,12 @@ fun BranchCard(
     modifier: Modifier
 ) {
     Card(
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier
             .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
         ) {
 
             BranchCardLabel(
@@ -263,7 +263,7 @@ fun BranchCardLabel(
     ) {
 
         Text(
-            text = "Ветвь №$branchNumber",
+            text = "Ветвь $branchNumber",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
