@@ -34,8 +34,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
+import net.kep.dc_guide.R
 import net.kep.dc_guide.data.Branch
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
@@ -46,7 +48,6 @@ fun CalcScreen(
     calcNavCon: NavController
 ) {
     val branches by branchViewModel.branches.collectAsState()
-
 
     Scaffold(
         topBar = {
@@ -64,7 +65,6 @@ fun CalcScreen(
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                //Для удобного доступа в самом низу экрана
                 .padding(bottom = 80.dp)
         ) {
             branches.forEachIndexed { index, branch ->
@@ -79,15 +79,14 @@ fun CalcScreen(
                     modifier = if (index > 0) {
                         Modifier
                             .padding(vertical = 10.dp, horizontal = 20.dp)
-                    }
-                    else {
+                    } else {
                         Modifier
                             .padding(it)
                             .padding(vertical = 10.dp, horizontal = 20.dp)
                     }
-
                 )
             }
+
 
             AddBranchButton(
                 vm = branchViewModel,
@@ -108,7 +107,7 @@ fun CalcTopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Расчёт цепи",
+                text = stringResource(id = R.string.calculate_circuit),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -155,7 +154,7 @@ fun ResultButton(
                 contentDescription = "Make result"
             )
             Text(
-                text = "Рассчитать",
+                text = stringResource(id = R.string.calculate),
                 fontSize = 22.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -183,10 +182,10 @@ fun AddBranchButton(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Добавить ветвь"
+                        contentDescription = "Add Branch"
                     )
                     Text(
-                        text = "Добавить ветвь",
+                        text = stringResource(id = R.string.add_branch),
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -229,16 +228,16 @@ fun BranchCard(
             )
 
             BranchMultiComponent(
-                label = "Резистор",
-                placeholder = "Ом",
+                label = stringResource(id = R.string.resistor),
+                placeholder = stringResource(id = R.string.ohm),
                 textFields = branch.resistors,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
             )
             BranchMultiComponent(
-                label = "ЭДС",
-                placeholder = "В",
+                label = stringResource(id = R.string.emf),
+                placeholder = stringResource(id = R.string.volt),
                 textFields = branch.emf,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -263,7 +262,7 @@ fun BranchCardLabel(
     ) {
 
         Text(
-            text = "Ветвь $branchNumber",
+            text = stringResource(id = R.string.branch) + " $branchNumber",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -274,7 +273,7 @@ fun BranchCardLabel(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Удалить ветвь"
+                    contentDescription = "Delete Branch"
                 )
             }
         }
@@ -296,13 +295,13 @@ fun BranchInputOutput(
         OutlinedTextField(
             label = {
                 Text(
-                    text = "Вход",
+                    text = stringResource(id = R.string.input),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
             placeholder = {
                 Text(
-                    text = "Номер узла",
+                    text = stringResource(id = R.string.node_number),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
@@ -310,9 +309,9 @@ fun BranchInputOutput(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
-            value = input.value,  // Используем значение из состояния
+            value = input.value,
             onValueChange = { newText ->
-                input.value = newText  // Обновляем состояние
+                input.value = newText
             },
             maxLines = 1,
             modifier = Modifier
@@ -323,13 +322,13 @@ fun BranchInputOutput(
         OutlinedTextField(
             label = {
                 Text(
-                    text = "Выход",
+                    text = stringResource(id = R.string.output),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
             placeholder = {
                 Text(
-                    text = "Номер узла",
+                    text = stringResource(id = R.string.node_number),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             },
@@ -402,7 +401,7 @@ fun BranchMultiComponent(
                         },
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
-                        Icon(Icons.Default.RemoveCircle, contentDescription = "Delete")
+                        Icon(Icons.Default.RemoveCircle, contentDescription = "Delete parameter")
                     }
                 }
             }
@@ -413,7 +412,7 @@ fun BranchMultiComponent(
             onClick = { textFields.add("") },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add")
+            Icon(Icons.Default.Add, contentDescription = "Add parameter")
         }
     }
 }

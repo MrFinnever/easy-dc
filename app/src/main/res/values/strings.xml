@@ -1,6 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General -->
     <string name="app_name">DC Guide</string>
-    <string name="guide">Теория</string>
-    <string name="calculator">Калькулятор</string>
-    <string name="settings">Настройки</string>
+    <string name="guide">Guide</string>
+    <string name="calculator">Calculator</string>
+    <string name="settings">Settings</string>
+
+    <!-- Calculator -->
+    <string name="calculation">Calculation</string>
+    <string name="calculate_circuit">Calculate circuit</string>
+    <string name="calculate">Calculate</string>
+    <string name="branch">Branch</string>
+    <string name="input">Input</string>
+    <string name="output">Output</string>
+    <string name="resistor">Resistor</string>
+    <string name="ohm">Ohm</string>
+    <string name="emf">EMF</string>
+    <string name="volt">V</string>
+    <string name="add_branch">Add Branch</string>
+    <string name="node_number">Node Number</string>
+    <string name="copy_all">Copy All</string>
+    <string name="copied">Copied</string>
+    <string name="all_copied">All copied</string>
+    <string name="help">Help</string>
+    <string name="result">Result</string>
+
+
+    <!-- Settings -->
+    <string name="app_theme">App Theme</string>
+    <string name="language">Language</string>
+    <string name="font_size">Font Size</string>
+    <string name="background_music">Background Music</string>
+
+    <!-- Authors and credits -->
+    <string name="project_team">Project Team</string>
+    <string name="project_supervisor">Project Supervisor</string>
+    <string name="Alexandra_Larionova">Alexandra Larionova</string>
+    <string name="program">Program</string>
+    <string name="Ivan_Lebedev">Ivan Lebedev</string>
+    <string name="application">Application</string>
+    <string name="Leonid_Krupenkov">Leonid Krupenkov</string>
+    <string name="Dmitry">Dmitriy</string>
+    <string name="credits">Credits</string>
+    <string name="consultation">Consultation</string>
+    <string name="Denis">Denis</string>
+    <string name="Alexander_Krylov">Alexander Krylov</string>
+
+
+
 </resources>

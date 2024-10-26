@@ -1,6 +1,5 @@
 package net.kep.dc_guide.ui.screens
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CopyAll
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -32,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import net.kep.dc_guide.R
 import net.kep.dc_guide.data.Branch
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
@@ -62,7 +61,6 @@ fun ResultScreen(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(it)
-                //Для удобного доступа в самом низу экрана
                 .padding(bottom = 80.dp)
         ) {
 
@@ -88,7 +86,7 @@ fun ResultTopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Результат",
+                text = stringResource(id = R.string.result),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -147,7 +145,7 @@ fun ResultCardLabel(
         modifier = modifier
     ) {
         Text(
-            text = "Ветвь $branchNumber",
+            text = stringResource(id = R.string.branch) + " $branchNumber",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -156,13 +154,16 @@ fun ResultCardLabel(
                 clipboardManager.setText(
                     AnnotatedString(branchNumber.toString())
                 )
-                Toast.makeText(context, "Скопировано", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.copied),
+                    Toast.LENGTH_SHORT
+                ).show()
             },
             shape = MaterialTheme.shapes.large
         ) {
             Icon(
                 imageVector = Icons.Default.ContentCopy,
-                contentDescription = "Copy a current"
+                contentDescription = "Copy Current"
             )
         }
     }
@@ -203,7 +204,10 @@ fun CopyAllFAB(
                 "I${branch.id} = ${branch.id} A"
             }
             clipboardManager.setText(AnnotatedString(allBranchCurrents))
-            Toast.makeText(context, "Всё скопировано", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.all_copied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     ) {
         Row(
@@ -213,7 +217,7 @@ fun CopyAllFAB(
                 imageVector = Icons.Default.CopyAll,
                 contentDescription = "Copy all")
             Text(
-                text = "Скопировать все",
+                text = stringResource(id = R.string.copy_all),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 5.dp)

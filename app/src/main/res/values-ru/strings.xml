@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- General -->
+    <string name="app_name">DC Guide</string>
+    <string name="guide">Теория</string>
+    <string name="calculator">Калькулятор</string>
+    <string name="settings">Настройки</string>
+
+    <!-- Calculator -->
+    <string name="calculation">Расчёт</string>
+    <string name="calculate_circuit">Рассчёт цепи</string>
+    <string name="calculate">Рассчитать</string>
+    <string name="branch">Ветвь</string>
+    <string name="input">Вход</string>
+    <string name="output">Выход</string>
+    <string name="resistor">Резистор</string>
+    <string name="ohm">Ом</string>
+    <string name="emf">ЭДС</string>
+    <string name="volt">В</string>
+    <string name="add_branch">Добавить ветвь</string>
+    <string name="node_number">Номер узла</string>
+    <string name="copy_all">Скопировать все</string>
+    <string name="copied">Скопировано</string>
+    <string name="all_copied">Все скопировано</string>
+    <string name="help">Справка</string>
+    <string name="result">Результат</string>
+
+    <!-- Settings -->
+    <string name="app_theme">Тема приложения</string>
+    <string name="language">Язык</string>
+    <string name="font_size">Размер шрифта</string>
+    <string name="background_music">Фоновая музыка</string>
+
+    <!-- Authors and credits -->
+    <string name="project_team">Команда проекта</string>
+    <string name="project_supervisor">Куратор проекта</string>
+    <string name="Alexandra_Larionova">Александра Ларионова</string>
+    <string name="program">Программа</string>
+    <string name="Ivan_Lebedev">Иван Лебедев</string>
+    <string name="application">Приложение</string>
+    <string name="Leonid_Krupenkov">Леонид Крупеньков</string>
+    <string name="Dmitry">Дмитрий</string>
+    <string name="credits">Благодарности</string>
+    <string name="consultation">Консультация</string>
+    <string name="Denis">Денис</string>
+    <string name="Alexander_Krylov">Александр Крылов</string>
+</resources>

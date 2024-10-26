@@ -1,27 +1,31 @@
 package net.kep.dc_guide.ui.navigation
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Settings
+import net.kep.dc_guide.R
 
 object NavBarItems {
-    val items = listOf(
-        BarItem(
-            title = "Теория",
-            icon = Icons.Default.Book,
-            route = "guide"
-        ),
-        BarItem(
-            title = "Калькулятор",
-            icon = Icons.Default.Calculate,
-            route = "calculator"
-        ),
-        BarItem(
-            title = "Настройки",
-            icon = Icons.Default.Settings,
-            route = "settings"
+    fun getItems(context: Context): List<BarItem> {
+         return listOf(
+            BarItem(
+                title = context.getString(R.string.guide),
+                icon = Icons.Default.Book,
+                route = "guide"
+            ),
+            BarItem(
+                title = context.getString(R.string.calculator),
+                icon = Icons.Default.Calculate,
+                route = "calculator"
+            ),
+            BarItem(
+                title = context.getString(R.string.settings),
+                icon = Icons.Default.Settings,
+                route = "settings"
+            )
         )
-    )
+    }
 }
 
