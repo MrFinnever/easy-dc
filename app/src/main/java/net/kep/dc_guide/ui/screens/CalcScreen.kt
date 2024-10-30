@@ -6,39 +6,45 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.QuestionMark
+import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.lifecycle.viewmodel.compose.viewModel
 import net.kep.dc_guide.R
-import net.kep.dc_guide.data.Branch
+import net.kep.dc_guide.data.BranchUI
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
 
@@ -57,7 +63,8 @@ fun CalcScreen(
         },
         floatingActionButton = {
             ResultButton(
-                calcNavCon = calcNavCon
+                calcNavCon = calcNavCon,
+                branchViewModel = branchViewModel
             )
         }
     ) {
@@ -69,7 +76,7 @@ fun CalcScreen(
         ) {
             branches.forEachIndexed { index, branch ->
                 BranchCard(
-                    branch = branch,
+                    branchUI = branch,
                     isRemovable = index > 0,
                     onRemove = {
                         if (index > 0) {
@@ -114,11 +121,11 @@ fun CalcTopAppBar(
         },
         actions = {
             IconButton(
-                onClick = { calcNavCon.navigate(route = "advice") }
+                onClick = { calcNavCon.navigate(route = "help") }
             ) {
                 Icon(
                     imageVector = Icons.Default.QuestionMark,
-                    contentDescription = "Back"
+                    contentDescription = "Help"
                 )
             }
         },
@@ -139,10 +146,12 @@ fun CalcTopAppBar(
 
 @Composable
 fun ResultButton(
-    calcNavCon: NavController
+    calcNavCon: NavController,
+    branchViewModel: BranchViewModel
 ) {
     ExtendedFloatingActionButton(
         onClick = {
+            branchViewModel.calculate()
             calcNavCon.navigate(route = "result")
         }
     ) {
@@ -186,8 +195,7 @@ fun AddBranchButton(
                     )
                     Text(
                         text = stringResource(id = R.string.add_branch),
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        fontSize = 18.sp
                     )
                 }
             }
@@ -198,7 +206,7 @@ fun AddBranchButton(
 
 @Composable
 fun BranchCard(
-    branch: Branch,
+    branchUI: BranchUI,
     isRemovable: Boolean,
     onRemove: () -> Unit,
     modifier: Modifier
@@ -213,15 +221,24 @@ fun BranchCard(
         ) {
 
             BranchCardLabel(
-                branchNumber = branch.id,
+                branchNumber = branchUI.id,
                 isRemovable = isRemovable,
                 onRemove = onRemove,
                 modifier = Modifier.fillMaxWidth()
             )
 
             BranchInputOutput(
-                input = branch.input,
-                output = branch.output,
+                input = branchUI.input,
+                output = branchUI.output,
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .fillMaxWidth()
+            )
+
+            BranchMultiComponent(
+                label = stringResource(id = R.string.emf),
+                placeholder = stringResource(id = R.string.volt),
+                textFields = branchUI.emf,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -230,15 +247,7 @@ fun BranchCard(
             BranchMultiComponent(
                 label = stringResource(id = R.string.resistor),
                 placeholder = stringResource(id = R.string.ohm),
-                textFields = branch.resistors,
-                modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .fillMaxWidth()
-            )
-            BranchMultiComponent(
-                label = stringResource(id = R.string.emf),
-                placeholder = stringResource(id = R.string.volt),
-                textFields = branch.emf,
+                textFields = branchUI.resistors,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()

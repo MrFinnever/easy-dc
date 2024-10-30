@@ -15,6 +15,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+
+enum class ThemeMode(val mode: String) {
+    LIGHT("LIGHT"),
+    DARK("DARK"),
+    SYSTEM("SYSTEM");
+
+    companion object {
+        fun fromString(value: String): ThemeMode {
+            return values().find { it.mode == value } ?: SYSTEM
+        }
+    }
+}
+
+
 private val DarkColorScheme = darkColorScheme(
     primary = Purple40,
     secondary = PurpleGrey80,

@@ -13,6 +13,7 @@ import net.kep.dc_guide.ui.theme.DCGuideTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        test()
         setContent {
             DCGuideTheme {
                 // A surface container using the 'background' color from the theme
@@ -24,5 +25,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }
+
+
+
+
+
+
+
+

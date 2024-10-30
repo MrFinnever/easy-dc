@@ -1,16 +1,17 @@
 package net.kep.dc_guide.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.kep.dc_guide.ui.screens.AdviceScreen
 import net.kep.dc_guide.ui.screens.CalcScreen
 import net.kep.dc_guide.ui.screens.GreetingScreen
+import net.kep.dc_guide.ui.screens.HelpScreen
 import net.kep.dc_guide.ui.screens.ResultScreen
+import net.kep.dc_guide.ui.screens.SolutionScreen
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun CalcNavHost(
@@ -30,19 +31,16 @@ fun CalcNavHost(
             )
         }
         composable(NavRoutes.Calculator.route) {
-            CalcScreen(
-                branchViewModel,
-                calcNavCon
-            )
+            CalcScreen(branchViewModel, calcNavCon)
         }
-        composable(NavRoutes.Advice.route) {
-            AdviceScreen(calcNavCon)
+        composable(NavRoutes.Help.route) {
+            HelpScreen(calcNavCon)
         }
         composable(NavRoutes.Result.route) {
-            ResultScreen(
-                branchViewModel,
-                calcNavCon
-            )
+            ResultScreen(branchViewModel, calcNavCon)
+        }
+        composable(NavRoutes.Solution.route) {
+            SolutionScreen(branchViewModel)
         }
     }
 }

@@ -24,6 +24,7 @@
     <string name="all_copied">Все скопировано</string>
     <string name="help">Справка</string>
     <string name="result">Результат</string>
+    <string name="solution">Решение</string>
 
     <!-- Settings -->
     <string name="app_theme">Тема приложения</string>

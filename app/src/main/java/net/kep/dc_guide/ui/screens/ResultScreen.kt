@@ -20,11 +20,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -38,8 +43,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.dc_guide.R
-import net.kep.dc_guide.data.Branch
+import net.kep.dc_guide.data.BranchResultUI
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
+import kotlin.math.absoluteValue
 
 
 @Composable
@@ -47,7 +53,10 @@ fun ResultScreen(
     branchViewModel: BranchViewModel = viewModel(),
     calcNavCon: NavController
 ) {
-    val branches by branchViewModel.branches.collectAsState()
+    val branches by branchViewModel.result.collectAsState()
+    var tabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Ответ", "Решение")
+
 
     Scaffold(
         topBar = {
@@ -63,16 +72,34 @@ fun ResultScreen(
                 .padding(it)
                 .padding(bottom = 80.dp)
         ) {
-
-            branches.forEach {branch ->
-                ResultCard(
-                    branch = branch,
-                    modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
-                )
-
-//                Text(text = "${branch.totalResistance()}")
-//                Text(text = "${branch.totalEMF()}")
+            TabRow(selectedTabIndex = tabIndex) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = tabIndex == index,
+                        onClick = { tabIndex = index }
+                    )
+                }
             }
+            when (tabIndex) {
+                0 -> {
+                    branches.forEach {branch ->
+                        ResultCard(
+                            branch = branch,
+                            modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
+                        )
+                    }
+                }
+                else -> {
+                    branches.forEach {branch ->
+                        ResultCard(
+                            branch = branch,
+                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 30.dp)
+                        )
+                    }
+                }
+            }
+
         }
     }
 }
@@ -107,7 +134,7 @@ fun ResultTopAppBar(
 
 @Composable
 fun ResultCard(
-    branch: Branch,
+    branch: BranchResultUI,
     modifier: Modifier
 ) {
     Card(
@@ -123,7 +150,7 @@ fun ResultCard(
                 modifier = Modifier.fillMaxWidth()
             )
             DCValueCard(
-                dcValue = branch.id.toDouble(),
+                dcValue = branch.current,
                 modifier = Modifier.padding(20.dp)
             )
         }
@@ -175,13 +202,19 @@ fun DCValueCard(
     dcValue: Double,
     modifier: Modifier
 ) {
+    fun formatValue(dcValue: Double): String {
+        val newValue = if (dcValue < 0.0) "−${dcValue.absoluteValue}" else dcValue.toString()
+        return newValue.replace(".", ",")
+    }
+
     Card(
         shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier
             .fillMaxWidth()
     ) {
+        if (dcValue < 0) dcValue.toString().replace("-", "－")
         Text(
-            text = "I = $dcValue",
+            text = "I = " + formatValue(dcValue),
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -191,7 +224,7 @@ fun DCValueCard(
 
 @Composable
 fun CopyAllFAB(
-    branches: MutableList<Branch>
+    branchUIS: List<BranchResultUI>
 
 ) {
     val clipboardManager = LocalClipboardManager.current
@@ -200,7 +233,7 @@ fun CopyAllFAB(
     ExtendedFloatingActionButton(
 
         onClick = {
-            val allBranchCurrents = branches.joinToString(separator = "\n") { branch ->
+            val allBranchCurrents = branchUIS.joinToString(separator = "\n") { branch ->
                 "I${branch.id} = ${branch.id} A"
             }
             clipboardManager.setText(AnnotatedString(allBranchCurrents))
