@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +55,8 @@ fun CalcScreen(
     calcNavCon: NavController
 ) {
     val branches by branchViewModel.branches.collectAsState()
+    val isError by branchViewModel.isError.collectAsState()
+    val errorMessage by branchViewModel.errorMessage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -83,6 +86,7 @@ fun CalcScreen(
                             branchViewModel.removeBranch(index)
                         }
                     },
+                    branchViewModel = branchViewModel,
                     modifier = if (index > 0) {
                         Modifier
                             .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -94,14 +98,18 @@ fun CalcScreen(
                 )
             }
 
-
             AddBranchButton(
                 vm = branchViewModel,
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (isError) {
+                ErrorAlert(
+                    branchViewModel = branchViewModel,
+                    errorMessage = errorMessage
+                )
+            }
         }
-
     }
 }
 
@@ -151,8 +159,7 @@ fun ResultButton(
 ) {
     ExtendedFloatingActionButton(
         onClick = {
-            branchViewModel.calculate()
-            calcNavCon.navigate(route = "result")
+            branchViewModel.checkBranches(calcNavCon = calcNavCon)
         }
     ) {
         Row(
@@ -169,6 +176,9 @@ fun ResultButton(
             )
         }
     }
+
+
+
 }
 
 
@@ -209,6 +219,7 @@ fun BranchCard(
     branchUI: BranchUI,
     isRemovable: Boolean,
     onRemove: () -> Unit,
+    branchViewModel: BranchViewModel,
     modifier: Modifier
 ) {
     Card(
@@ -239,6 +250,7 @@ fun BranchCard(
                 label = stringResource(id = R.string.emf),
                 placeholder = stringResource(id = R.string.volt),
                 textFields = branchUI.emf,
+                branchViewModel = branchViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -248,6 +260,7 @@ fun BranchCard(
                 label = stringResource(id = R.string.resistor),
                 placeholder = stringResource(id = R.string.ohm),
                 textFields = branchUI.resistors,
+                branchViewModel = branchViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -363,8 +376,11 @@ fun BranchMultiComponent(
     label: String,
     placeholder: String,
     textFields: SnapshotStateList<String>,
+    branchViewModel: BranchViewModel,
     modifier: Modifier = Modifier
 ) {
+    val isError by branchViewModel.isError.collectAsState()
+
     Column(
         modifier = modifier
     ) {
@@ -395,6 +411,7 @@ fun BranchMultiComponent(
                     onValueChange = { newText ->
                         textFields[index] = newText
                     },
+                    isError = isError,
                     maxLines = 1,
                     modifier = if (index == 0) {
                         Modifier.fillMaxWidth()
@@ -424,6 +441,33 @@ fun BranchMultiComponent(
             Icon(Icons.Default.Add, contentDescription = "Add parameter")
         }
     }
+}
+
+
+@Composable
+fun ErrorAlert(
+    branchViewModel: BranchViewModel,
+    errorMessage: Set<String>
+) {
+    AlertDialog(
+        onDismissRequest = { branchViewModel.resetError() },
+        title = { Text(text = "ERROR") },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
+                errorMessage.forEach {error ->
+                    Text(text = error)
+                }
+            }
+
+        },
+        confirmButton = {
+            Button(onClick = { branchViewModel.resetError() }) {
+                Text(text = "OK")
+            }
+        }
+    )
 }
 
 

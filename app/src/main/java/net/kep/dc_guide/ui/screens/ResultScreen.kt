@@ -55,7 +55,10 @@ fun ResultScreen(
 ) {
     val branches by branchViewModel.result.collectAsState()
     var tabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Ответ", "Решение")
+    val tabs = listOf(
+        stringResource(id = R.string.result),
+        stringResource(id = R.string.solution)
+    )
 
 
     Scaffold(
@@ -86,15 +89,16 @@ fun ResultScreen(
                     branches.forEach {branch ->
                         ResultCard(
                             branch = branch,
-                            modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
+                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
                         )
                     }
                 }
                 else -> {
                     branches.forEach {branch ->
+                        Text(text = "В РАЗРАБОТКЕ")
                         ResultCard(
                             branch = branch,
-                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 30.dp)
+                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
                         )
                     }
                 }
@@ -143,7 +147,8 @@ fun ResultCard(
             .fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
+            modifier = Modifier
+                .padding(vertical = 20.dp, horizontal = 20.dp)
         ) {
             ResultCardLabel(
                 branchNumber = branch.id,
