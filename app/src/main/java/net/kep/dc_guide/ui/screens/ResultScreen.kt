@@ -89,7 +89,9 @@ fun ResultScreen(
                     branches.forEach {branch ->
                         ResultCard(
                             branch = branch,
-                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
+                            modifier = Modifier
+                                .padding(top = 20.dp)
+                                .padding(horizontal = 20.dp)
                         )
                     }
                 }
@@ -148,10 +150,11 @@ fun ResultCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(vertical = 20.dp, horizontal = 20.dp)
+                .padding(top = 10.dp)
+                .padding(horizontal = 20.dp)
         ) {
             ResultCardLabel(
-                branchNumber = branch.id,
+                branch = branch,
                 modifier = Modifier.fillMaxWidth()
             )
             DCValueCard(
@@ -165,7 +168,7 @@ fun ResultCard(
 
 @Composable
 fun ResultCardLabel(
-    branchNumber: Int,
+    branch: BranchResultUI,
     modifier: Modifier
 ) {
     val clipboardManager = LocalClipboardManager.current
@@ -177,14 +180,16 @@ fun ResultCardLabel(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(id = R.string.branch) + " $branchNumber",
+            text = stringResource(id = R.string.branch) + " ${branch.id}",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
         OutlinedIconButton(
             onClick = {
+                val current = branch.current.toString().replace(".", ",")
+
                 clipboardManager.setText(
-                    AnnotatedString(branchNumber.toString())
+                    AnnotatedString(current)
                 )
                 Toast.makeText(context,
                     context.getString(R.string.copied),
@@ -230,7 +235,6 @@ fun DCValueCard(
 @Composable
 fun CopyAllFAB(
     branchUIS: List<BranchResultUI>
-
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
@@ -239,9 +243,13 @@ fun CopyAllFAB(
 
         onClick = {
             val allBranchCurrents = branchUIS.joinToString(separator = "\n") { branch ->
-                "I${branch.id} = ${branch.id} A"
+                val current = branch.current.toString().replace(".", ",")
+                if (branch.current < 0) current.replace("-", "－")
+                "I${branch.id} = $current A"
             }
-            clipboardManager.setText(AnnotatedString(allBranchCurrents))
+            clipboardManager.setText(
+                AnnotatedString(allBranchCurrents)
+            )
             Toast.makeText(context,
                 context.getString(R.string.all_copied),
                 Toast.LENGTH_SHORT

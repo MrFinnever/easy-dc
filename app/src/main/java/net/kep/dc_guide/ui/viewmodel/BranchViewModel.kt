@@ -1,11 +1,16 @@
 package net.kep.dc_guide.ui.viewmodel
+import android.content.Context
+import androidx.compose.runtime.toMutableStateList
+import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import net.kep.dc_guide.R
 import net.kep.dc_guide.data.BranchResultUI
 import net.kep.dc_guide.data.BranchUI
+import net.kep.dc_guide.data.ErrorBranch
 import net.kep.dc_guide.model.getCurrents
 
 
@@ -24,7 +29,11 @@ class BranchViewModel: ViewModel() {
     private val _errorMessage = MutableStateFlow(mutableSetOf<String>())
     val errorMessage: StateFlow<Set<String>> = _errorMessage.asStateFlow()
 
+    private val _errorBranches = MutableStateFlow(mutableListOf<ErrorBranch>())
+    val errorBranches: StateFlow<List<ErrorBranch>> = _errorBranches.asStateFlow()
 
+    private val _showErrorAlert = MutableStateFlow(false)
+    val showErrorAlert: StateFlow<Boolean> = _showErrorAlert.asStateFlow()
 
     //========== Methods ==========//
     fun addBranch() {
@@ -46,31 +55,91 @@ class BranchViewModel: ViewModel() {
             }.toMutableList()
     }
 
-    fun checkBranches(calcNavCon: NavController) {
-        resetError()
+
+    private fun validateBranches(context: Context) {
+        resetErrors()
         _errorMessage.value = mutableSetOf()
 
+        val errors = mutableListOf<ErrorBranch>()
+
         _branches.value.forEachIndexed { index, branch ->
+            val errorBranch = ErrorBranch(id = index + 1)
 
-            if (branch.input.value == "") {
-                _errorMessage.value = _errorMessage.value.toMutableSet()
-                    .apply { add("Ветвь ${index+1}. Не указан начальный узел") }
+            errorBranch.isInputError.value = (branch.input.value.isEmpty()
+                    || !branch.input.value.isNumber()
+                    || branch.input.value.toDouble() <= 0)
+
+            errorBranch.isOutputError.value = (branch.output.value.isEmpty()
+                    || !branch.output.value.isNumber()
+                    || branch.output.value.toDouble() <= 0)
+            if (errorBranch.isInputError.value || errorBranch.isOutputError.value) {
+                _errorMessage.value.add(
+                    getString(context, R.string.invalid_input) + " ${index + 1}"
+                )
             }
 
-            if (branch.output.value == "") {
-                _errorMessage.value = _errorMessage.value.toMutableSet()
-                    .apply { add("Ветвь ${index+1}. Не указан конечный узел") }
-            }
+            errorBranch.isResistorsError = branch.resistors.map { value ->
+                val hasError = value.isEmpty() || !value.isNumber() || value.toDouble() <= 0
+                if (hasError) _errorMessage.value.add(
+                    getString(context, R.string.invalid_input) + " ${index + 1}"
+                )
+                hasError
+            }.toMutableStateList()
+
+            errorBranch.isEMFError = branch.emf.map { value ->
+                val hasError = value.isEmpty() || !value.isNumber()
+                if (hasError) _errorMessage.value.add(
+                    getString(context, R.string.invalid_input) + " ${index + 1}"
+                )
+                hasError
+            }.toMutableStateList()
+
+            errors.add(errorBranch)
+
 
         }
 
-        if (_errorMessage.value.isNotEmpty())
-            setError()
-        else
-            calcNavCon.navigate(route = "result")
+        _errorBranches.value = errors
     }
 
-    fun calculate() {
+
+    fun checkBranches(calcNavCon: NavController, context: Context) {
+        validateBranches(context)
+
+        val hasErrors = _errorBranches.value.any { branch ->
+            branch.isInputError.value ||
+                    branch.isOutputError.value ||
+                    branch.isResistorsError.contains(true) ||
+                    branch.isEMFError.contains(true)
+        }
+        if (hasErrors) {
+            setError()
+            showErrorAlert()
+        }
+        else {
+            calculate()
+            calcNavCon.navigate(route = "result")
+        }
+    }
+    fun updateResistor(branchIndex: Int, resistorIndex: Int, newValue: String) {
+        _branches.value[branchIndex].resistors[resistorIndex] = newValue
+
+        val branch = _errorBranches.value[branchIndex]
+        branch.isResistorsError[resistorIndex] =
+            newValue.isEmpty() || !newValue.isNumber() || newValue.toDouble() <= 0
+    }
+
+    private fun String.isNumber(): Boolean {
+        val withDot = this.replace(",", ".")
+        return withDot.toDoubleOrNull() != null
+    }
+
+
+    private fun resetErrors() {
+        _errorBranches.value = mutableListOf()
+    }
+
+    private fun calculate() {
         _branches.value.forEachIndexed { index, branch ->
             println("Branch ${index + 1}:" +
                     "Node 1 = ${branch.input.value}," +
@@ -99,7 +168,15 @@ class BranchViewModel: ViewModel() {
         _isError.value = true
     }
 
-    fun resetError() {
+    private fun resetError() {
         _isError.value = false
+    }
+
+    private fun showErrorAlert() {
+        _showErrorAlert.value = true
+    }
+
+    fun hideErrorAlert() {
+        _showErrorAlert.value = false
     }
 }
