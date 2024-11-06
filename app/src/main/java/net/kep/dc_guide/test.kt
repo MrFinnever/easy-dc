@@ -5,9 +5,9 @@ import net.kep.dcc.elements.ElectricalCircuit
 
 fun test() {
     // Создаем экземпляры класса Branch
-    val branch1 = Branch(1, 2, 22.4, 10.0)
-    val branch2 = Branch(1, 2, 332.98, 1000.0)
-    val branch3 = Branch(1, 2, 55.1, 0.1)
+    val branch1 = Branch(1, 2, 123.0, 23.0)
+    val branch2 = Branch(1, 2, 132.0, 123.0)
+    //val branch3 = Branch(1, 2, 55.1, 0.1)
 
 // Создаем список веток
     val branches = mutableListOf<Branch>()
@@ -15,7 +15,7 @@ fun test() {
 // Добавляем ветки в список
     branches.add(branch1)
     branches.add(branch2)
-    branches.add(branch3)
+    //branches.add(branch3)
 
     val ec = ElectricalCircuit(branches)
 

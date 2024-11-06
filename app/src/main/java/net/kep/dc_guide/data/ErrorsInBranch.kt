@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-data class ErrorBranch(
+data class ErrorsInBranch(
     var id: Int = 1,
     var isInputError: MutableState<Boolean> = mutableStateOf(false),
     var isOutputError: MutableState<Boolean> = mutableStateOf(false),
@@ -13,14 +13,5 @@ data class ErrorBranch(
     var isEMFError: SnapshotStateList<Boolean> = mutableStateListOf(false),
     var hasNoBridges: MutableState<Boolean> = mutableStateOf(false),
     var isCircuitNotContinuous: MutableState<Boolean> = mutableStateOf(false),
-    var errorMessages: SnapshotStateList<String> = mutableStateListOf(""),
-) {
-    fun hasError(): Boolean {
-        return isInputError.value ||
-                isOutputError.value ||
-                isResistorsError.contains(true) ||
-                isEMFError.contains(true) ||
-                hasNoBridges.value ||
-                isCircuitNotContinuous.value
-    }
-}
+    var messages: MutableSet<String> = mutableSetOf(),
+)

@@ -1,5 +1,6 @@
 package net.kep.dc_guide.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,7 +47,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.dc_guide.R
 import net.kep.dc_guide.data.BranchUI
-import net.kep.dc_guide.data.ErrorBranch
+import net.kep.dc_guide.data.ErrorsInBranch
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
 
@@ -57,9 +57,8 @@ fun CalcScreen(
     calcNavCon: NavController
 ) {
     val branches by branchViewModel.branches.collectAsState()
-    val errorBranch by branchViewModel.errorBranches.collectAsState()
+    val errorsInBranch by branchViewModel.errorsInBranches.collectAsState()
     val showErrorAlert by branchViewModel.showErrorAlert.collectAsState()
-    val errorMessage by branchViewModel.errorMessage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -81,7 +80,7 @@ fun CalcScreen(
                 .padding(bottom = 80.dp)
         ) {
             branches.forEachIndexed { index, branch ->
-                val error = errorBranch.getOrNull(index) ?: ErrorBranch()
+                val error = errorsInBranch.getOrNull(index) ?: ErrorsInBranch()
 
                 BranchCard(
                     index = index,
@@ -93,7 +92,7 @@ fun CalcScreen(
                         }
                     },
                     branchViewModel = branchViewModel,
-                    errorBranch = error,
+                    errorsInBranch = error,
                     modifier = if (index > 0) {
                         Modifier
                             .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -113,7 +112,7 @@ fun CalcScreen(
             if (showErrorAlert) {
                 ErrorAlert(
                     branchViewModel = branchViewModel,
-                    errorMessage = errorMessage
+                    errorsInBranchList = errorsInBranch
                 )
             }
         }
@@ -164,13 +163,9 @@ fun ResultButton(
     calcNavCon: NavController,
     branchViewModel: BranchViewModel
 ) {
-    val context = LocalContext.current
     ExtendedFloatingActionButton(
         onClick = {
-            branchViewModel.checkBranches(
-                calcNavCon = calcNavCon,
-                context = context
-            )
+            branchViewModel.makeResult(calcNavCon = calcNavCon)
         }
     ) {
         Row(
@@ -231,7 +226,7 @@ fun BranchCard(
     branchUI: BranchUI,
     isRemovable: Boolean,
     onRemove: () -> Unit,
-    errorBranch: ErrorBranch,
+    errorsInBranch: ErrorsInBranch,
     branchViewModel: BranchViewModel,
     modifier: Modifier
 ) {
@@ -254,7 +249,7 @@ fun BranchCard(
             BranchInputOutput(
                 input = branchUI.input,
                 output = branchUI.output,
-                errorBranch = errorBranch,
+                errorsInBranch = errorsInBranch,
                 branchViewModel = branchViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -265,7 +260,7 @@ fun BranchCard(
                 label = stringResource(id = R.string.emf),
                 placeholder = stringResource(id = R.string.volt),
                 textFields = branchUI.emf,
-                fieldErrors = errorBranch.isEMFError,
+                fieldErrors = errorsInBranch.isEMFError,
                 branchViewModel = branchViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -276,7 +271,7 @@ fun BranchCard(
                 label = stringResource(id = R.string.resistor),
                 placeholder = stringResource(id = R.string.ohm),
                 textFields = branchUI.resistors,
-                fieldErrors = errorBranch.isResistorsError,
+                fieldErrors = errorsInBranch.isResistorsError,
                 branchViewModel = branchViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -325,7 +320,7 @@ fun BranchInputOutput(
     input: MutableState<String>,
     output: MutableState<String>,
     branchViewModel: BranchViewModel,
-    errorBranch: ErrorBranch,
+    errorsInBranch: ErrorsInBranch,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -353,8 +348,9 @@ fun BranchInputOutput(
             value = input.value,
             onValueChange = { newText ->
                 input.value = newText
+                
             },
-            isError = errorBranch.isInputError.value,
+            isError = errorsInBranch.isInputError.value,
             maxLines = 1,
             modifier = Modifier
                 .padding(end = 5.dp)
@@ -379,10 +375,10 @@ fun BranchInputOutput(
                 keyboardType = KeyboardType.Number
             ),
             value = output.value,
-            onValueChange = { newValue ->
-                output.value = newValue
+            onValueChange = { newText ->
+                output.value = newText
             },
-            isError = errorBranch.isOutputError.value,
+            isError = errorsInBranch.isOutputError.value,
             maxLines = 1,
             modifier = Modifier
                 .padding(start = 5.dp)
@@ -447,9 +443,6 @@ fun BranchMultiComponent(
                             if (textFields.size > 1) {
                                 textFields.removeAt(index)
                             }
-                            if (fieldErrors.size > 1) {
-                                fieldErrors.removeAt(index)
-                            }
                         },
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
@@ -473,7 +466,7 @@ fun BranchMultiComponent(
 @Composable
 fun ErrorAlert(
     branchViewModel: BranchViewModel,
-    errorMessage: Set<String>
+    errorsInBranchList: List<ErrorsInBranch>
 ) {
     AlertDialog(
         onDismissRequest = { branchViewModel.hideErrorAlert() },
@@ -482,9 +475,11 @@ fun ErrorAlert(
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                errorMessage.forEach {error ->
+                Log.e("ERROR", errorsInBranchList.toString())
+                errorsInBranchList.forEachIndexed { index, errors ->
+                    Log.e("ERROR", errors.messages.toString())
                     Text(
-                        text = error,
+                        text = errors.messages.last(),
                         fontSize = 16.sp
                     )
                 }
