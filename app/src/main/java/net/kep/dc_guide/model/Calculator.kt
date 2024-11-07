@@ -81,10 +81,8 @@ fun isCircuitContinuous(branchesUI: MutableList<BranchUI>): Boolean {
         res = ec.isCircuitContinuous
         Log.d("Calculator", res.toString())
     } catch (e: Exception) {
-        Log.e("ERROR", e.toString())
-        res = ec.isCircuitContinuous
-        Log.d("Calculator", res.toString())
+        Log.e("ERROR isCircuitNotCont", e.toString())
     }
-
+    Log.d("Calculator", res.toString())
     return res
 }

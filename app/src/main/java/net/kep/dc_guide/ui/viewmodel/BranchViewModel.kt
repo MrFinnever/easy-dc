@@ -106,7 +106,7 @@ class BranchViewModel: ViewModel() {
 
                 Log.w("Validation", "Branch ${index + 1} has invalid values.")
 
-                // Проверяем, чтобы ошибка не добавлялась дважды
+                // Проверяем, что ошибка не добавлялась дважды
                 if (errorsInBranch.messages.isNotEmpty() && errorsList.none { it.id == errorsInBranch.id && it.messages == errorsInBranch.messages }) {
                     errorsList.add(errorsInBranch)
                 }
@@ -116,29 +116,22 @@ class BranchViewModel: ViewModel() {
 
             // 4. Проверка на замкнутость цепи для этой ветви
             try {
-                checkIfCircuitIsNotContinuous(errorsInBranch)
-
-                if (errorsInBranch.isCircuitNotContinuous.value) {
+                Log.e("TRY", checkIfCircuitIsNotContinuous(errorsInBranch).toString())
+                if (checkIfCircuitIsNotContinuous(errorsInBranch)) {
+                    _errorsInBranches.value.forEach { erBr ->
+                        if (erBr.messages.contains("Цепь не замкнута."))
+                            return@forEachIndexed
+                    }
                     circuitNotContinuous = true
                     errorsInBranch.messages.add("Цепь не замкнута.")
+//                    if (errorsInBranch.messages.isNotEmpty() && errorsList.none { it.id == errorsInBranch.id && it.messages == errorsInBranch.messages }) {
+//
+//                    }
+                    errorsList.add(errorsInBranch)
                 }
             } catch (e: CircuitIsNotContinuousException) {
-                // Обработка исключения замкнутости цепи
-                Log.e("Validation", "Цепь не замкнута: ${e.message}")
-                errorsInBranch.messages.add("Цепь не замкнута.")
-                circuitNotContinuous = true
+                Log.e("CATCH", checkIfCircuitIsNotContinuous(errorsInBranch).toString())
             }
-
-
-//            checkIfCircuitIsNotContinuous(errorsInBranch)
-//            if (errorsInBranch.isCircuitNotContinuous.value) {
-//                circuitNotContinuous = true
-//            }
-//
-//            // Добавляем ошибку в список, если она не пустая
-//            if (errorsInBranch.messages.isNotEmpty()) {
-//                errorsList.add(errorsInBranch)
-//            }
         }
 
         _errorsInBranches.value = errorsList
@@ -306,9 +299,17 @@ class BranchViewModel: ViewModel() {
 
 
 
-    private fun checkIfCircuitIsNotContinuous(errorsInBranch: ErrorsInBranch) {
-        val circuitNotContinuous = !isCircuitContinuous(_branches.value)
+    private fun checkIfCircuitIsNotContinuous(errorsInBranch: ErrorsInBranch): Boolean {
+        var circuitNotContinuous = false
+        try {
+            circuitNotContinuous = !isCircuitContinuous(_branches.value)
+        } catch (e: CircuitIsNotContinuousException) {
+            circuitNotContinuous = true
+            Log.e("check NOT CONT", circuitNotContinuous.toString())
+        }
 
+
+        Log.w("NotCONT", circuitNotContinuous.toString())
         errorsInBranch.isCircuitNotContinuous.value = circuitNotContinuous
 
         if (circuitNotContinuous) {
@@ -317,6 +318,8 @@ class BranchViewModel: ViewModel() {
         } else {
             Log.d("Validation", "Цепь замкнута в ветви: ${errorsInBranch.id}.")
         }
+
+        return circuitNotContinuous
     }
 
     private fun String.isPositive(): Boolean {
