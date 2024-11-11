@@ -39,10 +39,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,59 +53,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import net.kep.dc_guide.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Настройки",
-                            fontSize = 22.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                }
-            )
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            //.padding(it)
+            .padding(top = 30.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .verticalScroll(rememberScrollState())
-        ) {
-            AppPresentation()
+        AppPresentation()
 
-            Spacer(modifier = Modifier.padding(5.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
 
-            Language()
-            ThemeSelectionScreen()
-            FontSize()
+        Language()
+        ThemeSelectionScreen()
+        FontSize()
 
-            Spacer(modifier = Modifier.padding(5.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
 
-            Authors()
-            Credits()
+        Authors()
+        Credits()
 
-            Spacer(modifier = Modifier.padding(5.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
 
-            AboutApp()
-            OpenSource()
-            License()
-        }
+        AboutApp()
+        OpenSource()
+        License()
     }
+
 }
 
 
@@ -132,8 +114,9 @@ fun AppPresentation() {
             )
         }
         Text(
-            text = "DC Guide",
+            text = stringResource(id = R.string.app_name),
             fontSize = 26.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(top = 10.dp)
         )
         Text(

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- General -->
-    <string name="app_name">DC Guide</string>
+    <string name="app_name">Easy DC</string>
     <string name="guide">Guide</string>
     <string name="calculator">Calculator</string>
     <string name="settings">Settings</string>

@@ -59,6 +59,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.foundation:foundation:1.7.5")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -79,6 +81,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     //Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    //Zoomable
+    implementation("net.engawapg.lib:zoomable:1.6.2")
+    implementation("io.github.grizzi91:bouquet:1.1.2")
 
     implementation(project(":dcc"))
 
