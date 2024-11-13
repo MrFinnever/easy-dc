@@ -4,59 +4,31 @@ import android.util.Log
 import net.kep.dc_guide.data.BranchUI
 import net.kep.dcc.elements.Branch
 import net.kep.dcc.elements.ElectricalCircuit
-
-//private fun collectBranches(branchesUI: MutableList<BranchUI>): ArrayList<Branch> {
-//    var branches = ArrayList<Branch>()
-//
-//    branchesUI.forEach { branch ->
-//        val input = branch.input.value.toIntOrNull() ?: 0
-//        val output = branch.output.value.toIntOrNull() ?: 0
-//        val totalResistance = branch.totalResistance()
-//        val totalEMF = branch.totalEMF()
-//
-//        branches = branches.apply {
-//            add(
-//                Branch(
-//                    input,
-//                    output,
-//                    totalEMF,
-//                    totalResistance
-//                )
-//            )
-//        }
-//    }
-//
-//    return branches
-//}
+import net.kep.dcc.exceptions.CircuitHasBridgesException
+import net.kep.dcc.exceptions.CircuitIsNotContinuousException
 
 
 private fun collectBranches(branchesUI: MutableList<BranchUI>): ArrayList<Branch> {
     val branches = ArrayList<Branch>()
 
     branchesUI.forEach { branch ->
-        val inputValue = branch.input.value
-        val outputValue = branch.output.value
-
-        // Логирование значений
-        Log.d("BranchInputOutput", "Input: $inputValue, Output: $outputValue")
         val input = branch.input.value.toIntOrNull() ?: 0
         val output = branch.output.value.toIntOrNull() ?: 0
 
-        Log.d("BranchInputOutput", "Input: $input, Output: $output")
+        Log.d("Calculator:collectBranches", "input: $input, output: $output")
 
         val totalResistance = branch.totalResistance()
         val totalEMF = branch.totalEMF()
 
-        // Добавляем проверку для totalResistance и totalEMF
-        if (totalResistance <= 0) {
-            Log.e("ERROR","Общее сопротивление недопустимо: $totalResistance")
-        }
-        if (totalEMF < 0) {  // Предположим, что ЭДС не может быть отрицательной
-            Log.e("ERROR","Общее ЭДС недопустимо: $totalEMF")
-        }
+        Log.d (
+            "Calculator:collectBranches",
+            "totalResistance: $totalResistance, totalEMF: $totalEMF"
+        )
 
         branches.add(Branch(input, output, totalEMF, totalResistance))
     }
+
+    Log.d("Calculator:collectBranches", "branches: $branches")
 
     return branches
 }
@@ -66,23 +38,46 @@ fun getCurrents(branchesUI: MutableList<BranchUI>): List<Double> {
     val branches = collectBranches(branchesUI)
     val ec = ElectricalCircuit(branches)
 
+    Log.d("Calculator:getCurrents", ec.toString())
+
     return ec.currents
 }
 
+
 fun isCircuitContinuous(branchesUI: MutableList<BranchUI>): Boolean {
     val branches = collectBranches(branchesUI)
-    Log.d("Calculator", branches.toString())
+    Log.d("Calculator:isCircuitContinuous", branches.toString())
 
     val ec = ElectricalCircuit(branches)
-
     var res = false
 
     try {
         res = ec.isCircuitContinuous
-        Log.d("Calculator", res.toString())
-    } catch (e: Exception) {
-        Log.e("ERROR isCircuitNotCont", e.toString())
+        Log.d("Calculator:isCircuitContinuous", res.toString())
+    } catch (e: CircuitIsNotContinuousException) {
+        Log.e("Calculator:isCircuitContinuous", e.toString())
     }
-    Log.d("Calculator", res.toString())
+
+    Log.d("Calculator:isCircuitContinuous", res.toString())
+    return res
+}
+
+fun hasBridges(branchesUI: MutableList<BranchUI>): Boolean {
+    val branches = collectBranches(branchesUI)
+    Log.d("Calculator:hasBridges", branches.toString())
+
+    val ec = ElectricalCircuit(branches)
+    var res = false
+
+    try {
+        // Для теста - присвою true
+        //res = ec.hasNoBridges()
+        res = true
+        Log.d("Calculator:hasBridges", res.toString())
+    } catch (e: CircuitHasBridgesException) {
+        Log.e("Calculator:hasBridges", e.toString())
+    }
+
+    Log.d("Calculator:hasBridges", res.toString())
     return res
 }

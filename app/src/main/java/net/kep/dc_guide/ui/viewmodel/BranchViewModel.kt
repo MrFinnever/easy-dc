@@ -10,7 +10,9 @@ import net.kep.dc_guide.data.BranchResultUI
 import net.kep.dc_guide.data.BranchUI
 import net.kep.dc_guide.data.ErrorsInBranch
 import net.kep.dc_guide.model.getCurrents
+import net.kep.dc_guide.model.hasBridges
 import net.kep.dc_guide.model.isCircuitContinuous
+import net.kep.dcc.exceptions.CircuitHasBridgesException
 import net.kep.dcc.exceptions.CircuitIsNotContinuousException
 
 
@@ -55,6 +57,7 @@ class BranchViewModel: ViewModel() {
         val errorsList = mutableListOf<ErrorsInBranch>()
         var oneBranch = false
         var hasErrors = false
+        var ecNotContinuous = false
 
 
 
@@ -99,8 +102,18 @@ class BranchViewModel: ViewModel() {
 
         if (!oneBranch && !hasErrors && checkIfCircuitIsNotContinuous()) {
             val branchErrors = ErrorsInBranch()
+            ecNotContinuous = true
             branchErrors.isCircuitNotContinuous = mutableStateOf(true)
             branchErrors.messages.add("Цепь не замкнута!")
+
+            errorsList.add(branchErrors)
+        }
+
+        if (!oneBranch && !hasErrors && !ecNotContinuous && checkIfCircuitHasBridges()) {
+            val branchErrors = ErrorsInBranch()
+
+            branchErrors.hasNoBridges = mutableStateOf(true)
+            branchErrors.messages.add("Цепь имеет мосты!")
 
             errorsList.add(branchErrors)
         }
@@ -108,9 +121,13 @@ class BranchViewModel: ViewModel() {
         _errorsInBranches.value = errorsList
 
         if (_showErrorAlert.value)
-            Log.e("Validation", "Critical errors found during validation.")
+            Log.e(
+                "BranchViewModel:validate",
+                "Critical errors found during validation")
         else
-            Log.i("Validation", "Validation completed without critical errors.")
+            Log.i(
+                "BranchViewModel:validate",
+                "Validation completed without critical errors")
 
     }
 
@@ -118,7 +135,10 @@ class BranchViewModel: ViewModel() {
 
         // Проверяем, что индекс в пределах границ
         if (branchIndex < 0 || branchIndex >= _branches.value.size) {
-            Log.e("Validation", "Индекс ветви $branchIndex вне границ.")
+            Log.e(
+                "BranchViewModel:checkIfBranchIsEmpty",
+                "Индекс ветви $branchIndex вне границ"
+            )
             return false
         }
 
@@ -129,9 +149,12 @@ class BranchViewModel: ViewModel() {
         val areEMFsEmpty = branch.emf.all { it.isEmpty() }
         val areResistorsEmpty = branch.resistors.all { it.isEmpty() }
 
-        Log.d("Validation", "Ветвь ${branchIndex + 1}: " +
+        Log.d(
+            "BranchViewModel:checkIfBranchIsEmpty",
+            "Ветвь ${branchIndex + 1}: " +
                 "вход пустой = $isInputEmpty, выход пустой = $isOutputEmpty, " +
-                "ЭДС пустые = $areEMFsEmpty, резисторы пустые = $areResistorsEmpty")
+                "ЭДС пустые = $areEMFsEmpty, резисторы пустые = $areResistorsEmpty"
+        )
 
 
         val errorsInBranch = _errorsInBranches.value
@@ -150,8 +173,10 @@ class BranchViewModel: ViewModel() {
         }
 
         val allElementsEmpty = isInputEmpty && isOutputEmpty && areEMFsEmpty && areResistorsEmpty
-        Log.d("Validation", "Все элементы " +
-                "ветви ${branchIndex + 1} пустые: $allElementsEmpty")
+        Log.d(
+            "BranchViewModel:checkIfBranchIsEmpty",
+            "Все элементы ветви ${branchIndex + 1} пустые: $allElementsEmpty"
+        )
 
         return allElementsEmpty
     }
@@ -159,7 +184,10 @@ class BranchViewModel: ViewModel() {
     private fun checkIfParametersAreEmpty(branchIndex: Int): Boolean {
         // Защита от выхода за границы
         if (branchIndex < 0 || branchIndex >= _branches.value.size) {
-            Log.e("Validation", "Индекс ветви $branchIndex вне границ.")
+            Log.e(
+                "BranchViewModel:checkIfParametersAreEmpty",
+                "Индекс ветви $branchIndex вне границ"
+            )
             return false
         }
 
@@ -170,9 +198,12 @@ class BranchViewModel: ViewModel() {
         val areEMFsEmpty = branch.emf.map { it.isEmpty() }
         val areResistorsEmpty = branch.resistors.map { it.isEmpty() }
 
-        Log.d("Validation", "Ветвь ${branchIndex + 1}: " +
+        Log.d(
+            "BranchViewModel:checkIfParametersAreEmpty",
+            "Ветвь ${branchIndex + 1}: " +
                 "вход пустой = $isInputEmpty, выход пустой = $isOutputEmpty, " +
-                "ЭДС пустые = $areEMFsEmpty, резисторы пустые = $areResistorsEmpty")
+                "ЭДС пустые = $areEMFsEmpty, резисторы пустые = $areResistorsEmpty"
+        )
 
         val errorsInBranch = _errorsInBranches.value.getOrNull(branchIndex) ?: ErrorsInBranch(branchIndex + 1)
 
@@ -189,7 +220,10 @@ class BranchViewModel: ViewModel() {
                 areEMFsEmpty.contains(true) ||
                 areResistorsEmpty.contains(true)
 
-        Log.d("Validation", "Ветвь ${branchIndex + 1} имеет пустые параметры: $hasEmptyParameters")
+        Log.d(
+            "BranchViewModel:checkIfParametersAreEmpty",
+            "Ветвь ${branchIndex + 1} имеет пустые параметры: $hasEmptyParameters"
+        )
 
         return hasEmptyParameters
     }
@@ -197,7 +231,10 @@ class BranchViewModel: ViewModel() {
     private fun checkForInvalidValues(branchIndex: Int): Boolean {
         // Защита от выхода за границы
         if (branchIndex < 0 || branchIndex >= _branches.value.size) {
-            Log.e("Validation", "Индекс ветви $branchIndex вне границ.")
+            Log.e(
+                "BranchViewModel:checkForInvalidValues",
+                "Индекс ветви $branchIndex вне границ"
+            )
             return false
         }
 
@@ -212,7 +249,11 @@ class BranchViewModel: ViewModel() {
                 !branch.input.value.isPositive()
         if (errorsInBranch.isInputError.value) {
             hasInvalidValue = true
-            Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение входа '${branch.input.value}'.")
+            Log.d(
+                "BranchViewModel:checkForInvalidValues",
+                "Ветвь ${branchIndex + 1}: некорректное значение входа " +
+                        branch.input.value
+            )
         }
 
         // Выход
@@ -221,7 +262,11 @@ class BranchViewModel: ViewModel() {
                 !branch.output.value.isPositive()
         if (errorsInBranch.isOutputError.value) {
             hasInvalidValue = true
-            Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение выхода '${branch.output.value}'.")
+            Log.d(
+                "BranchViewModel:checkForInvalidValues",
+                "Ветвь ${branchIndex + 1}: некорректное значение выхода " +
+                        branch.output.value
+            )
         }
 
         // ЭДС
@@ -233,28 +278,37 @@ class BranchViewModel: ViewModel() {
             errorsInBranch.isEMFError[emfIndex] = emf.isEmpty() || !emf.isNumber()
             if (errorsInBranch.isEMFError[emfIndex]) {
                 hasInvalidValue = true
-                Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение ЭДС на индексе $emfIndex: '${emf}'.")
+                Log.d(
+                    "BranchViewModel:checkForInvalidValues",
+                    "Ветвь ${branchIndex + 1}: " +
+                            "некорректное значение ЭДС на индексе $emfIndex: $emf"
+                )
             }
         }
 
         // Резисторы
         while (errorsInBranch.isResistorsError.size < branch.resistors.size) {
-            errorsInBranch.isResistorsError.add(false) // Инициализируем ошибки для новых резисторов
+            // Инициализируем ошибки для новых резисторов
+            errorsInBranch.isResistorsError.add(false)
         }
         branch.resistors.forEachIndexed { resistorIndex, resistor ->
             // Проверка резисторов на ошибки
             errorsInBranch.isResistorsError[resistorIndex] = resistor.isEmpty() ||
                     !resistor.isNumber() ||
                     !resistor.isPositive()
+
             if (errorsInBranch.isResistorsError[resistorIndex]) {
                 hasInvalidValue = true
-                Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение резистора на индексе $resistorIndex: '${resistor}'.")
+                Log.d(
+                    "BranchViewModel:checkForInvalidValues",
+                    "Ветвь ${branchIndex + 1}: некорректное значение резистора на индексе " +
+                            "$resistorIndex: '${resistor}'.")
             }
         }
 
         // Обновляем ошибки для этой ветви в списке ошибок
         if (hasInvalidValue) {
-            Log.e("INVALID", _errorsInBranches.value.toString())
+            Log.e("BranchViewModel:checkForInvalidValues", _errorsInBranches.value.toString())
 
             // Инициализация, чтобы избежать ошибки
             if (_errorsInBranches.value.size <= branchIndex) {
@@ -275,28 +329,43 @@ class BranchViewModel: ViewModel() {
     private fun checkIfCircuitIsNotContinuous(): Boolean {
         var circuitNotContinuous = false
         try {
-            circuitNotContinuous = !isCircuitContinuous(_branches.value)
+            isCircuitContinuous(_branches.value)
         } catch (e: CircuitIsNotContinuousException) {
             circuitNotContinuous = true
-            Log.e("check NOT CONT", circuitNotContinuous.toString())
+            Log.e("BranchViewModel:checkIfCircuitIsNotContinuous", circuitNotContinuous.toString())
         }
 
         return circuitNotContinuous
     }
 
+
+    private fun checkIfCircuitHasBridges(): Boolean {
+        var ecHasBridges = false
+        try {
+            hasBridges(_branches.value)
+        } catch (e: CircuitHasBridgesException) {
+            ecHasBridges = true
+            Log.e("BranchViewModel:checkIfCircuitHasBridges", ecHasBridges.toString())
+        }
+
+        return ecHasBridges
+    }
+
+
     private fun String.isPositive(): Boolean {
         return (this.toIntOrNull() ?: -1) > 0
     }
+
 
     private fun String.isNumber(): Boolean {
         val withDot = this.replace(",", ".")
         return withDot.toDoubleOrNull() != null
     }
 
+
     private fun resetErrors() {
         _errorsInBranches.value = mutableListOf()
     }
-
 
 
     fun makeResult(calcNavCon: NavController) {
@@ -310,6 +379,7 @@ class BranchViewModel: ViewModel() {
         }
     }
 
+
     private fun hasErrors(): Boolean {
         return _errorsInBranches.value.any { errorsInBranch ->
             errorsInBranch.isInputError.value ||
@@ -322,14 +392,16 @@ class BranchViewModel: ViewModel() {
     }
 
 
-
     private fun calculate() {
         _branches.value.forEachIndexed { index, branch ->
-            println("Branch ${index + 1}:" +
+            Log.d(
+                "BranchViewModel:calculate",
+                "Branch ${index + 1}:" +
                     "Node 1 = ${branch.input.value}," +
                     "Node 2 = ${branch.output.value}," +
                     "EMF = ${branch.emf}," +
-                    "R = ${branch.resistors}")
+                    "Resist = ${branch.resistors}"
+            )
         }
 
         try {
@@ -342,9 +414,9 @@ class BranchViewModel: ViewModel() {
                 )
             }.toMutableList()
             _result.value = results
+
         } catch (e: Exception) {
-            println("Error: ${e.localizedMessage}")
-            e.printStackTrace()
+            Log.e("BranchViewModel:calculate", "$e")
         }
     }
 
