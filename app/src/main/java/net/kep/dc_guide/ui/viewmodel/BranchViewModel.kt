@@ -1,5 +1,6 @@
 package net.kep.dc_guide.ui.viewmodel
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,95 +53,59 @@ class BranchViewModel: ViewModel() {
         resetErrors()
 
         val errorsList = mutableListOf<ErrorsInBranch>()
-        var hasInvalidValues = false
-        var circuitNotContinuous = false
+        var oneBranch = false
+        var hasErrors = false
 
-        // Для отслеживания ошибки о недостаточном числе ветвей
-        var insufficientBranchesError = false
-        // Для отслеживания критических ошибок (пустая ветвь, недостаток ветвей)
-        var hasCriticalErrors = false
+
 
         // Проверка на недостаток ветвей (до обработки всех ветвей)
-        if (_branches.value.size < 2 && !errorsList.any { it.messages.contains("Недостаточно ветвей для замкнутой цепи. Нужно минимум 2 ветви.") }) {
+        if (_branches.value.size < 2) {
+            oneBranch = true
+
             val error = ErrorsInBranch(id = 1)
             error.messages.add("Недостаточно ветвей для замкнутой цепи. Нужно минимум 2 ветви.")
             errorsList.add(error)
-            insufficientBranchesError = true
+
+            Log.d("Check 1", errorsList.toString())
         }
 
-        _branches.value.forEachIndexed { index, branch ->
-            val errorsInBranch = ErrorsInBranch(id = index + 1)
-            Log.d("Validation", "Validating branch: ${index + 1}")
+        if (!oneBranch) {
+            _branches.value.forEachIndexed { index, branch ->
+                val branchErrors = ErrorsInBranch(id = index + 1)
 
-            // 1. Проверка на пустую ветвь
-            if (checkIfBranchIsEmpty(index)) {
-                Log.w("Validation", "Branch ${index + 1} is empty.")
+                var empty = false
+                var hasEmpty = false
 
-                errorsInBranch.messages.add("Ветвь ${index + 1} пустая.")
-                errorsList.add(errorsInBranch)
-
-                hasCriticalErrors = true
-
-                // Пропускаем дальнейшую проверку для этой ветви
-                return@forEachIndexed
-            }
-
-            // 2. Проверка на пустые параметры в ветви
-            val hasEmptyParams = checkIfParametersAreEmpty(index)
-            if (hasEmptyParams) {
-                errorsInBranch.messages.add("Ветвь ${index + 1} содержит пустые параметры.")
-                Log.w("Validation", "Branch ${index + 1} contains empty parameters.")
-
-                // Проверяем, чтобы ошибка не добавлялась дважды
-                if (errorsInBranch.messages.isNotEmpty() && errorsList.none { it.id == errorsInBranch.id && it.messages == errorsInBranch.messages }) {
-                    errorsList.add(errorsInBranch)
+                if (checkIfBranchIsEmpty(index)) {
+                    hasErrors = true
+                    empty = true
+                    branchErrors.messages.add("Ветвь ${index+1} пустая.")
                 }
 
-                return@forEachIndexed // Пропускаем дальнейшую проверку для этой ветви
-            }
-
-            // 3. Проверка на корректность значений параметров
-            if (checkForInvalidValues(index)) {
-                errorsInBranch.messages.add("Ветвь ${index + 1} содержит некорректные значения.")
-                hasInvalidValues = true
-
-                Log.w("Validation", "Branch ${index + 1} has invalid values.")
-
-                // Проверяем, что ошибка не добавлялась дважды
-                if (errorsInBranch.messages.isNotEmpty() && errorsList.none { it.id == errorsInBranch.id && it.messages == errorsInBranch.messages }) {
-                    errorsList.add(errorsInBranch)
+                if (!empty && checkIfParametersAreEmpty(index)) {
+                    hasErrors = true
+                    hasEmpty = true
+                    branchErrors.messages.add("Ветвь ${index+1} содержит пустые параметры.")
                 }
 
-                return@forEachIndexed // Пропускаем дальнейшую проверку для этой ветви
-            }
-
-            // 4. Проверка на замкнутость цепи для этой ветви
-            try {
-                Log.e("TRY", checkIfCircuitIsNotContinuous(errorsInBranch).toString())
-                if (checkIfCircuitIsNotContinuous(errorsInBranch)) {
-                    _errorsInBranches.value.forEach { erBr ->
-                        if (erBr.messages.contains("Цепь не замкнута."))
-                            return@forEachIndexed
-                    }
-                    circuitNotContinuous = true
-                    errorsInBranch.messages.add("Цепь не замкнута.")
-//                    if (errorsInBranch.messages.isNotEmpty() && errorsList.none { it.id == errorsInBranch.id && it.messages == errorsInBranch.messages }) {
-//
-//                    }
-                    errorsList.add(errorsInBranch)
+                if (!empty && !hasEmpty && checkForInvalidValues(index)) {
+                    hasErrors = true
+                    branchErrors.messages.add("Ветвь ${index+1} содержит некорректные данные.")
                 }
-            } catch (e: CircuitIsNotContinuousException) {
-                Log.e("CATCH", checkIfCircuitIsNotContinuous(errorsInBranch).toString())
+
+                errorsList.add(branchErrors)
             }
+        }
+
+        if (!oneBranch && !hasErrors && checkIfCircuitIsNotContinuous()) {
+            val branchErrors = ErrorsInBranch()
+            branchErrors.isCircuitNotContinuous = mutableStateOf(true)
+            branchErrors.messages.add("Цепь не замкнута!")
+
+            errorsList.add(branchErrors)
         }
 
         _errorsInBranches.value = errorsList
-        Log.d("Validation", "Errors in branches: $errorsList")
-
-        // Показываем ошибку, если есть критическая ошибка или недостаточно ветвей
-        hasCriticalErrors = hasCriticalErrors || insufficientBranchesError
-
-        _showErrorAlert.value = hasCriticalErrors || hasInvalidValues || circuitNotContinuous
 
         if (_showErrorAlert.value)
             Log.e("Validation", "Critical errors found during validation.")
@@ -264,59 +229,56 @@ class BranchViewModel: ViewModel() {
             errorsInBranch.isEMFError.add(false) // Инициализируем ошибки для новых источников ЭДС
         }
         branch.emf.forEachIndexed { emfIndex, emf ->
+            // Проверка ЭДС на ошибки
             errorsInBranch.isEMFError[emfIndex] = emf.isEmpty() || !emf.isNumber()
             if (errorsInBranch.isEMFError[emfIndex]) {
                 hasInvalidValue = true
-                Log.d("Validation", "Ветвь ${branchIndex + 1}: " +
-                        "некорректное значение ЭДС на индексе $emfIndex: '${emf}'.")
+                Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение ЭДС на индексе $emfIndex: '${emf}'.")
             }
         }
 
         // Резисторы
-        // Проверка, что количество элементов в списке ошибок соответствует количеству резисторов
         while (errorsInBranch.isResistorsError.size < branch.resistors.size) {
-            // Инициализируем ошибки для новых резисторов
-            errorsInBranch.isResistorsError.add(false)
+            errorsInBranch.isResistorsError.add(false) // Инициализируем ошибки для новых резисторов
         }
         branch.resistors.forEachIndexed { resistorIndex, resistor ->
+            // Проверка резисторов на ошибки
             errorsInBranch.isResistorsError[resistorIndex] = resistor.isEmpty() ||
                     !resistor.isNumber() ||
                     !resistor.isPositive()
             if (errorsInBranch.isResistorsError[resistorIndex]) {
                 hasInvalidValue = true
-                Log.d("Validation", "Ветвь ${branchIndex + 1}: " +
-                        "некорректное значение резистора на индексе $resistorIndex: '${resistor}'.")
+                Log.d("Validation", "Ветвь ${branchIndex + 1}: некорректное значение резистора на индексе $resistorIndex: '${resistor}'.")
             }
         }
 
         // Обновляем ошибки для этой ветви в списке ошибок
         if (hasInvalidValue) {
+            Log.e("INVALID", _errorsInBranches.value.toString())
+
+            // Инициализация, чтобы избежать ошибки
+            if (_errorsInBranches.value.size <= branchIndex) {
+
+                // Инициализируем список с размером branchIndex + 1, если размер меньше
+                _errorsInBranches.value = _errorsInBranches.value.toMutableList().apply {
+                    while (size <= branchIndex) {
+                        add(ErrorsInBranch())
+                    }
+                }
+            }
             _errorsInBranches.value[branchIndex] = errorsInBranch
         }
 
         return hasInvalidValue
     }
 
-
-
-    private fun checkIfCircuitIsNotContinuous(errorsInBranch: ErrorsInBranch): Boolean {
+    private fun checkIfCircuitIsNotContinuous(): Boolean {
         var circuitNotContinuous = false
         try {
             circuitNotContinuous = !isCircuitContinuous(_branches.value)
         } catch (e: CircuitIsNotContinuousException) {
             circuitNotContinuous = true
             Log.e("check NOT CONT", circuitNotContinuous.toString())
-        }
-
-
-        Log.w("NotCONT", circuitNotContinuous.toString())
-        errorsInBranch.isCircuitNotContinuous.value = circuitNotContinuous
-
-        if (circuitNotContinuous) {
-            errorsInBranch.messages.add("Цепь не замкнута.")
-            Log.d("Validation", "Цепь не замкнута в ветви: ${errorsInBranch.id}.")
-        } else {
-            Log.d("Validation", "Цепь замкнута в ветви: ${errorsInBranch.id}.")
         }
 
         return circuitNotContinuous

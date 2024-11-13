@@ -476,12 +476,18 @@ fun ErrorAlert(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 Log.e("ErrorAlert", errorsInBranchList.toString())
+
                 errorsInBranchList.forEachIndexed { index, errors ->
                     Log.e("ErrorAlert", errors.messages.toString())
-                    Text(
-                        text = errors.messages.last(),
-                        fontSize = 16.sp
-                    )
+
+                    // Проверяем, есть ли сообщения в списке
+                    if (errors.messages.isNotEmpty()) {
+                        Text(
+                            text = errors.messages.last(),
+                            fontSize = 16.sp
+                        )
+                    }
+
                     if (errors.messages.contains("Цепь не замкнута."))
                         return@forEachIndexed
                 }
