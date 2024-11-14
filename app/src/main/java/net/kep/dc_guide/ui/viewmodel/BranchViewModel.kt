@@ -341,10 +341,10 @@ class BranchViewModel: ViewModel() {
 
     private fun checkIfCircuitHasBridges(): Boolean {
         var ecHasBridges = false
+
         try {
-            hasBridges(_branches.value)
+            ecHasBridges = hasBridges(_branches.value)
         } catch (e: CircuitHasBridgesException) {
-            ecHasBridges = true
             Log.e("BranchViewModel:checkIfCircuitHasBridges", ecHasBridges.toString())
         }
 
@@ -430,26 +430,18 @@ class BranchViewModel: ViewModel() {
     }
 
 
-    fun onValueChange(branchIndex: Int, field: Field, newText: String, indexInList: Int = -1) {
-        val branch = _branches.value[branchIndex]
+//    fun onValueChange(branchIndex: Int, field: Field, newText: String, indexInList: Int = -1) {
+//        val branch = _branches.value[branchIndex]
+//
+//        when (field) {
+//            Field.INPUT -> branch.input.value = newText
+//            Field.OUTPUT -> branch.output.value = newText
+//            Field.EMF -> if (indexInList in branch.emf.indices) branch.emf[indexInList] = newText
+//            Field.RESISTOR -> if (indexInList in branch.resistors.indices) branch.resistors[indexInList] = newText
+//        }
+//
+//        validate() // Перепроверка всех ошибок после изменения значения
+//    }
+//
 
-        when (field) {
-            Field.INPUT -> branch.input.value = newText
-            Field.OUTPUT -> branch.output.value = newText
-            Field.EMF -> if (indexInList in branch.emf.indices) branch.emf[indexInList] = newText
-            Field.RESISTOR -> if (indexInList in branch.resistors.indices) branch.resistors[indexInList] = newText
-        }
-
-        validate() // Перепроверка всех ошибок после изменения значения
-    }
-
-
-}
-
-
-enum class Field {
-    INPUT,
-    OUTPUT,
-    EMF,
-    RESISTOR
 }

@@ -70,9 +70,7 @@ fun hasBridges(branchesUI: MutableList<BranchUI>): Boolean {
     var res = false
 
     try {
-        // Для теста - присвою true
-        //res = ec.hasNoBridges()
-        res = true
+        res = !ec.hasNoBridges()
         Log.d("Calculator:hasBridges", res.toString())
     } catch (e: CircuitHasBridgesException) {
         Log.e("Calculator:hasBridges", e.toString())

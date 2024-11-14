@@ -6,7 +6,7 @@ import net.kep.dcc.elements.ElectricalCircuit
 fun test() {
     // Создаем экземпляры класса Branch
     val branch1 = Branch(1, 2, 123.0, 23.0)
-    val branch2 = Branch(1, 2, 132.0, 123.0)
+    val branch2 = Branch(1, 2, 123.0, 123.0)
     //val branch3 = Branch(1, 2, 55.1, 0.1)
 
 // Создаем список веток
