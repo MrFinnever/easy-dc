@@ -366,24 +366,57 @@ private fun ListOfNodes(
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
-                LazyVerticalGrid(
-                    columns = GridCells.FixedSize(48.dp),
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .heightIn(max = 400.dp)
+                Nodes(list = list, modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth())
+
+            }
+        }
+    }
+}
+
+
+@Composable
+fun Nodes(
+    list: MutableList<Int>,
+    modifier: Modifier
+) {
+    Card(
+        modifier = modifier
+    ) {
+        Column {
+            Text(
+                text = "Номера узлов",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 10.dp, top = 10.dp)
+            )
+        }
+        LazyVerticalGrid(
+            columns = GridCells.FixedSize(48.dp),
+            modifier = Modifier
+                .padding(10.dp)
+                .heightIn(max = 400.dp)
+        ) {
+            items(list.size) {
+                Box(
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(list.size) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp) // Задаем размер квадратика
-                                .padding(4.dp)
-                                .background(
-                                    color = Color.Gray,
-                                    shape = CircleShape
-                                )
-                        )
-                    }
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp) // Размер квадратика
+                            .padding(4.dp)
+                            .background(
+                                color = Color.Gray,
+                                shape = CircleShape
+                            )
+                    )
+                    Text(
+                        text = "${list[it]}",
+                        color = Color.White
+                    )
                 }
+
             }
         }
     }
@@ -437,7 +470,7 @@ private fun AmountOfComponents(
             }
             else {
                 Text(
-                    text = "Количество компонент: ${amount.intValue}",
+                    text = "Компонент связанности: ${amount.intValue}",
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 10.dp)
@@ -471,7 +504,7 @@ private fun AmountOfComponents(
 @Composable
 private fun SolutionScreenPreview() {
     val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf(1, 2, 3, 4, 5)
+    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
     val amountOfComponents = remember { mutableIntStateOf(3) }
 
     SolutionScreen(
