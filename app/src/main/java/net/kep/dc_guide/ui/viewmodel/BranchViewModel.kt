@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import net.kep.dc_guide.data.BranchResultUI
 import net.kep.dc_guide.data.BranchUI
 import net.kep.dc_guide.data.ErrorsInBranch
+import net.kep.dc_guide.model.getAllNodes
 import net.kep.dc_guide.model.getCurrents
 import net.kep.dc_guide.model.hasBridges
 import net.kep.dc_guide.model.isCircuitContinuous
@@ -23,6 +24,9 @@ class BranchViewModel: ViewModel() {
 
     private val _result = MutableStateFlow(mutableListOf(BranchResultUI()))
     val result: StateFlow<List<BranchResultUI>> = _result.asStateFlow()
+
+    private val _allNodes = MutableStateFlow(mutableListOf<Int>())
+    val allNodes: StateFlow<MutableList<Int>> = _allNodes.asStateFlow()
 
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
@@ -375,6 +379,7 @@ class BranchViewModel: ViewModel() {
             showErrorAlert()
         } else {
             calculate()
+            getNodes()
             calcNavCon.navigate(route = "result")
         }
     }
@@ -431,6 +436,13 @@ class BranchViewModel: ViewModel() {
 
     fun hideErrorAlert() {
         _showErrorAlert.value = false
+    }
+
+
+    @SafeVarargs
+    fun getNodes() {
+        val listOfNodes = getAllNodes(_branches.value)
+        _allNodes.value = listOfNodes.toMutableList()
     }
 
 

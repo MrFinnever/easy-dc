@@ -79,3 +79,12 @@ fun hasBridges(branchesUI: MutableList<BranchUI>): Boolean {
     Log.d("Calculator:hasBridges", res.toString())
     return res
 }
+
+fun getAllNodes(branchesUI: MutableList<BranchUI>): List<Int> {
+    val branches = collectBranches(branchesUI)
+    val ec = ElectricalCircuit(branches)
+
+    Log.d("Calculator:getAllNodes", ec.toString())
+
+    return ec.allNodes
+}

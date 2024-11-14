@@ -2,13 +2,18 @@ package net.kep.dc_guide.ui.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -34,7 +40,8 @@ import net.kep.dc_guide.data.BranchResultUI
 
 @Composable
 fun SolutionScreen(
-    branches: List<BranchResultUI>
+    branches: List<BranchResultUI>,
+    listOfNodes: MutableList<Int>
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -45,18 +52,26 @@ fun SolutionScreen(
             .fillMaxSize()
             .padding(bottom = 80.dp)
     ) {
-        StepOne(branches)
+        StepOne(
+            branches = branches,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        StepTwo(
+            list = listOfNodes,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
     }
-
 }
 
 @Composable
-fun StepOne(
-    branches: List<BranchResultUI>
+private fun StepOne(
+    branches: List<BranchResultUI>,
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
     ) {
         Text(
             text ="Step 1 - Collect Branches",
@@ -79,13 +94,12 @@ fun StepOne(
                     .fillMaxWidth()
             )
         }
-
     }
 }
 
 
 @Composable
-fun BranchSolutionCard(
+private fun BranchSolutionCard(
     id: Int,
     branch: BranchResultUI,
     modifier: Modifier
@@ -112,7 +126,7 @@ fun BranchSolutionCard(
 }
 
 @Composable
-fun BranchSolutionLabel(
+private fun BranchSolutionLabel(
     branchNumber: Int,
     branch: BranchResultUI,
     modifier: Modifier
@@ -165,7 +179,7 @@ fun BranchSolutionLabel(
 
 
 @Composable
-fun BranchSolutionParams(
+private fun BranchSolutionParams(
     inputNode: Int,
     outputNode: Int,
     summarizedEMF: Double,
@@ -209,7 +223,7 @@ fun BranchSolutionParams(
 
 
 @Composable
-fun BranchSolutionInput(
+private fun BranchSolutionInput(
     inputNode: Int,
     modifier: Modifier
 ) {
@@ -228,7 +242,7 @@ fun BranchSolutionInput(
 
 
 @Composable
-fun BranchSolutionOutput(
+private fun BranchSolutionOutput(
     outputNode: Int,
     modifier: Modifier
 ) {
@@ -248,7 +262,7 @@ fun BranchSolutionOutput(
 
 
 @Composable
-fun BranchSolutionEMF(
+private fun BranchSolutionEMF(
     summarizedEMF: Double,
     modifier: Modifier
 ) {
@@ -269,7 +283,7 @@ fun BranchSolutionEMF(
 
 
 @Composable
-fun BranchSolutionResistance(
+private fun BranchSolutionResistance(
     summarizedResistance: Double,
     modifier: Modifier
 ) {
@@ -289,11 +303,89 @@ fun BranchSolutionResistance(
 }
 
 
+@Composable
+private fun StepTwo(
+    list: MutableList<Int>,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text ="Step 2",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+        ListOfNodes(
+            list = list,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+
+@Composable
+private fun ListOfNodes(
+    list: MutableList<Int>,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+
+            if (list.size == 0) {
+                Text(
+                    text = "В цепи нет узлов",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            else {
+                Text(
+                    text = "Количество узлов: ${list.size}",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.FixedSize(48.dp),
+                    modifier = Modifier.padding(10.dp).heightIn(max = 400.dp)
+                ) {
+                    items(list.size) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp) // Задаем размер квадратика
+                                .padding(4.dp)
+                                .background(
+                                    color = Color.Gray,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
-fun SolutionScreenPreview() {
+private fun SolutionScreenPreview() {
     val branches = listOf(BranchResultUI())
+    val listOfNodes = mutableListOf<Int>()
+
     SolutionScreen(
-        branches
+        branches,
+        listOfNodes
     )
 }

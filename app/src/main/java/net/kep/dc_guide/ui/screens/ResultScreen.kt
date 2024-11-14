@@ -61,6 +61,8 @@ fun ResultScreen(
     calcNavCon: NavController
 ) {
     val branches by branchViewModel.result.collectAsState()
+    val listOfNodes by branchViewModel.allNodes.collectAsState()
+
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
         stringResource(id = R.string.result),
@@ -99,16 +101,17 @@ fun ResultScreen(
                     ResultCards(branches)
                 }
                 Tabs.SOLUTION -> {
-                    SolutionScreen(branches)
+                    SolutionScreen(branches, listOfNodes)
                 }
             }
+
         }
     }
 }
 
 
 @Composable
-fun ResultCards(branches: List<BranchResultUI>) {
+private fun ResultCards(branches: List<BranchResultUI>) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -129,7 +132,7 @@ fun ResultCards(branches: List<BranchResultUI>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResultTopAppBar(
+private fun ResultTopAppBar(
     calcNavCon: NavController
 ) {
     TopAppBar(
@@ -155,7 +158,7 @@ fun ResultTopAppBar(
 
 
 @Composable
-fun ResultCard(
+private fun ResultCard(
     branch: BranchResultUI,
     modifier: Modifier
 ) {
@@ -183,7 +186,7 @@ fun ResultCard(
 
 
 @Composable
-fun ResultCardLabel(
+private fun ResultCardLabel(
     branch: BranchResultUI,
     modifier: Modifier
 ) {
@@ -224,7 +227,7 @@ fun ResultCardLabel(
 
 
 @Composable
-fun DCValueCard(
+private fun DCValueCard(
     dcValue: Double,
     modifier: Modifier
 ) {
@@ -249,7 +252,7 @@ fun DCValueCard(
 
 
 @Composable
-fun CopyAllFAB(
+private fun CopyAllFAB(
     listBranchResult: List<BranchResultUI>,
     selectedTab: Tabs
 ) {
@@ -316,7 +319,7 @@ fun CopyAllFAB(
 
 @Preview
 @Composable
-fun ResultScreenPreview() {
+private fun ResultScreenPreview() {
     val branchViewModel = BranchViewModel()
     val calcNav = rememberNavController()
     ResultScreen(
