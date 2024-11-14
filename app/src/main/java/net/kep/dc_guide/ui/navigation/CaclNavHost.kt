@@ -10,7 +10,6 @@ import net.kep.dc_guide.ui.screens.CalcScreen
 import net.kep.dc_guide.ui.screens.GreetingScreen
 import net.kep.dc_guide.ui.screens.HelpScreen
 import net.kep.dc_guide.ui.screens.ResultScreen
-import net.kep.dc_guide.ui.screens.SolutionScreen
 import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 
 @Composable
@@ -38,9 +37,6 @@ fun CalcNavHost(
         }
         composable(NavRoutes.Result.route) {
             ResultScreen(branchViewModel, calcNavCon)
-        }
-        composable(NavRoutes.Solution.route) {
-            SolutionScreen(branchViewModel)
         }
     }
 }

@@ -397,10 +397,10 @@ class BranchViewModel: ViewModel() {
             Log.d(
                 "BranchViewModel:calculate",
                 "Branch ${index + 1}:" +
-                    "Node 1 = ${branch.input.value}," +
-                    "Node 2 = ${branch.output.value}," +
-                    "EMF = ${branch.emf}," +
-                    "Resist = ${branch.resistors}"
+                    "Node 1 = ${branch.input.value},\n" +
+                    "Node 2 = ${branch.output.value},\n" +
+                    "EMF = ${branch.emf},\n" +
+                    "Resistance = ${branch.resistors}."
             )
         }
 
@@ -409,14 +409,18 @@ class BranchViewModel: ViewModel() {
 
             val results = res.mapIndexed { index, current ->
                 BranchResultUI(
-                    index+1,
-                    current
+                    id = index+1,
+                    current = current,
+                    inputNode = _branches.value[index].input.value.toInt(),
+                    outputNode = _branches.value[index].output.value.toInt(),
+                    summarizedEMF = _branches.value[index].totalEMF(),
+                    summarizedResistance = _branches.value[index].totalResistance()
                 )
             }.toMutableList()
             _result.value = results
-
         } catch (e: Exception) {
-            Log.e("BranchViewModel:calculate", "$e")
+            println("Error: ${e.localizedMessage}")
+            e.printStackTrace()
         }
     }
 

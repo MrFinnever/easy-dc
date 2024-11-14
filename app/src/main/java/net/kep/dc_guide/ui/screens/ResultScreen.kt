@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,7 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,64 +49,79 @@ import net.kep.dc_guide.ui.viewmodel.BranchViewModel
 import kotlin.math.absoluteValue
 
 
+enum class Tabs {
+    RESULT,
+    SOLUTION
+}
+
+
 @Composable
 fun ResultScreen(
     branchViewModel: BranchViewModel = viewModel(),
     calcNavCon: NavController
 ) {
     val branches by branchViewModel.result.collectAsState()
-    var tabIndex by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
         stringResource(id = R.string.result),
         stringResource(id = R.string.solution)
     )
-
 
     Scaffold(
         topBar = {
             ResultTopAppBar(calcNavCon = calcNavCon)
         },
         floatingActionButton = {
-            CopyAllFAB(branches)
+            CopyAllFAB(
+                listBranchResult = branches,
+                selectedTab = selectedTab
+            )
         }
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
                 .padding(it)
-                .padding(bottom = 80.dp)
         ) {
-            TabRow(selectedTabIndex = tabIndex) {
+            TabRow(
+                selectedTabIndex = selectedTab.ordinal
+            ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         text = { Text(title) },
-                        selected = tabIndex == index,
-                        onClick = { tabIndex = index }
+                        selected = selectedTab.ordinal == index,
+                        onClick = { selectedTab = Tabs.entries[index] }
                     )
                 }
             }
-            when (tabIndex) {
-                0 -> {
-                    branches.forEach {branch ->
-                        ResultCard(
-                            branch = branch,
-                            modifier = Modifier
-                                .padding(top = 20.dp)
-                                .padding(horizontal = 20.dp)
-                        )
-                    }
+
+            when (selectedTab) {
+                Tabs.RESULT -> {
+                    ResultCards(branches)
                 }
-                else -> {
-                    branches.forEach {branch ->
-                        Text(text = "В РАЗРАБОТКЕ")
-                        ResultCard(
-                            branch = branch,
-                            modifier = Modifier.padding(vertical = 20.dp, horizontal = 20.dp)
-                        )
-                    }
+                Tabs.SOLUTION -> {
+                    SolutionScreen(branches)
                 }
             }
+        }
+    }
+}
 
+
+@Composable
+fun ResultCards(branches: List<BranchResultUI>) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxSize()
+            .padding(bottom = 80.dp)
+    ) {
+        branches.forEach {branch ->
+            ResultCard(
+                branch = branch,
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .padding(horizontal = 20.dp)
+            )
         }
     }
 }
@@ -234,7 +250,8 @@ fun DCValueCard(
 
 @Composable
 fun CopyAllFAB(
-    branchUIS: List<BranchResultUI>
+    listBranchResult: List<BranchResultUI>,
+    selectedTab: Tabs
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
@@ -242,18 +259,42 @@ fun CopyAllFAB(
     ExtendedFloatingActionButton(
 
         onClick = {
-            val allBranchCurrents = branchUIS.joinToString(separator = "\n") { branch ->
-                val current = branch.current.toString().replace(".", ",")
-                if (branch.current < 0) current.replace("-", "－")
-                "I${branch.id} = $current A"
+            when (selectedTab) {
+                Tabs.RESULT -> {
+                    val allBranchCurrents = listBranchResult
+                        .joinToString(separator = "\n") { branch ->
+                            val current = branch.current.toString()
+                                .replace(".", ",")
+
+                            if (branch.current < 0) current
+                                .replace("-", "－")
+
+                            "I${branch.id} = $current A"
+                    }
+                    clipboardManager.setText(AnnotatedString(allBranchCurrents))
+                }
+                Tabs.SOLUTION -> {
+                    val allBranchParams = listBranchResult
+                        .joinToString(separator = "\n") { branch ->
+                            val emf = branch.summarizedEMF.toString()
+
+                            if (branch.summarizedEMF < 0)
+                                emf.replace("-", "－")
+
+                            "====================\n" +
+                            "Branch ID = ${branch.id}\n" +
+                                    "Input Node = ${branch.inputNode}\n" +
+                                    "Output Node = ${branch.outputNode}\n" +
+                                    "Summarized EMF = ${branch.summarizedEMF}\n" +
+                                    "Summarized Resistance = ${branch.summarizedResistance}"
+                    }
+
+
+                    clipboardManager.setText(AnnotatedString(allBranchParams))
+                }
             }
-            clipboardManager.setText(
-                AnnotatedString(allBranchCurrents)
-            )
-            Toast.makeText(context,
-                context.getString(R.string.all_copied),
-                Toast.LENGTH_SHORT
-            ).show()
+
+            Toast.makeText(context, context.getString(R.string.all_copied), Toast.LENGTH_SHORT).show()
         }
     ) {
         Row(

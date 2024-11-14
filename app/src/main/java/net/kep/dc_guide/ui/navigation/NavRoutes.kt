@@ -6,6 +6,5 @@ sealed class NavRoutes(val route: String) {
     object Calculator : NavRoutes(route ="calculator")
     object Help : NavRoutes(route ="help")
     object Result : NavRoutes(route ="result")
-    object Solution : NavRoutes(route ="solution")
     object Settings : NavRoutes(route ="settings")
 }
