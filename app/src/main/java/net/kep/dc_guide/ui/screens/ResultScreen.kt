@@ -62,6 +62,7 @@ fun ResultScreen(
 ) {
     val branches by branchViewModel.result.collectAsState()
     val listOfNodes by branchViewModel.allNodes.collectAsState()
+    val amountOfComponents by branchViewModel.amountOfComponents.collectAsState()
 
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
@@ -101,7 +102,7 @@ fun ResultScreen(
                     ResultCards(branches)
                 }
                 Tabs.SOLUTION -> {
-                    SolutionScreen(branches, listOfNodes)
+                    SolutionScreen(branches, listOfNodes, amountOfComponents)
                 }
             }
 

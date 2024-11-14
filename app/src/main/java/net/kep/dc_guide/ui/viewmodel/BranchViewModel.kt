@@ -1,5 +1,7 @@
 package net.kep.dc_guide.ui.viewmodel
 import android.util.Log
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -10,6 +12,7 @@ import net.kep.dc_guide.data.BranchResultUI
 import net.kep.dc_guide.data.BranchUI
 import net.kep.dc_guide.data.ErrorsInBranch
 import net.kep.dc_guide.model.getAllNodes
+import net.kep.dc_guide.model.getConnectedComponentsCount
 import net.kep.dc_guide.model.getCurrents
 import net.kep.dc_guide.model.hasBridges
 import net.kep.dc_guide.model.isCircuitContinuous
@@ -27,6 +30,9 @@ class BranchViewModel: ViewModel() {
 
     private val _allNodes = MutableStateFlow(mutableListOf<Int>())
     val allNodes: StateFlow<MutableList<Int>> = _allNodes.asStateFlow()
+
+    private val _amountOfComponents = MutableStateFlow(mutableIntStateOf(0))
+    val amountOfComponents: StateFlow<MutableIntState> = _amountOfComponents.asStateFlow()
 
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
@@ -380,6 +386,7 @@ class BranchViewModel: ViewModel() {
         } else {
             calculate()
             getNodes()
+            getComponentsAmount()
             calcNavCon.navigate(route = "result")
         }
     }
@@ -439,25 +446,13 @@ class BranchViewModel: ViewModel() {
     }
 
 
-    @SafeVarargs
-    fun getNodes() {
-        val listOfNodes = getAllNodes(_branches.value)
+    private fun getNodes() {
+        val listOfNodes: List<Int> = getAllNodes(_branches.value)
         _allNodes.value = listOfNodes.toMutableList()
     }
 
-
-//    fun onValueChange(branchIndex: Int, field: Field, newText: String, indexInList: Int = -1) {
-//        val branch = _branches.value[branchIndex]
-//
-//        when (field) {
-//            Field.INPUT -> branch.input.value = newText
-//            Field.OUTPUT -> branch.output.value = newText
-//            Field.EMF -> if (indexInList in branch.emf.indices) branch.emf[indexInList] = newText
-//            Field.RESISTOR -> if (indexInList in branch.resistors.indices) branch.resistors[indexInList] = newText
-//        }
-//
-//        validate() // Перепроверка всех ошибок после изменения значения
-//    }
-//
-
+    private fun getComponentsAmount() {
+        val amount: Int = getConnectedComponentsCount(_branches.value)
+        _amountOfComponents.value = mutableIntStateOf(amount)
+    }
 }

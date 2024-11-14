@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
@@ -24,6 +25,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +45,8 @@ import net.kep.dc_guide.data.BranchResultUI
 @Composable
 fun SolutionScreen(
     branches: List<BranchResultUI>,
-    listOfNodes: MutableList<Int>
+    listOfNodes: MutableList<Int>,
+    components: MutableIntState
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -59,6 +64,11 @@ fun SolutionScreen(
         )
         StepTwo(
             list = listOfNodes,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        StepThree(
+            amount = components,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -358,9 +368,88 @@ private fun ListOfNodes(
 
                 LazyVerticalGrid(
                     columns = GridCells.FixedSize(48.dp),
-                    modifier = Modifier.padding(10.dp).heightIn(max = 400.dp)
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .heightIn(max = 400.dp)
                 ) {
                     items(list.size) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp) // Задаем размер квадратика
+                                .padding(4.dp)
+                                .background(
+                                    color = Color.Gray,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun StepThree(
+    amount: MutableIntState,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text ="Step 3",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+        AmountOfComponents(
+            amount = amount,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+
+@Composable
+private fun AmountOfComponents(
+    amount: MutableIntState,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+
+            if (amount.intValue == 0) {
+                Text(
+                    text = "В цепи нет компонент",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            else {
+                Text(
+                    text = "Количество компонент: ${amount.intValue}",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.FixedSize(48.dp),
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .heightIn(max = 400.dp)
+                ) {
+                    items(amount.intValue){
                         Box(
                             modifier = Modifier
                                 .size(48.dp) // Задаем размер квадратика
@@ -382,10 +471,12 @@ private fun ListOfNodes(
 @Composable
 private fun SolutionScreenPreview() {
     val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf<Int>()
+    val listOfNodes = mutableListOf(1, 2, 3, 4, 5)
+    val amountOfComponents = remember { mutableIntStateOf(3) }
 
     SolutionScreen(
         branches,
-        listOfNodes
+        listOfNodes,
+        amountOfComponents
     )
 }
