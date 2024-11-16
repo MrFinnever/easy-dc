@@ -281,7 +281,8 @@ class BranchViewModel: ViewModel() {
 
         // ЭДС
         while (errorsInBranch.isEMFError.size < branch.emf.size) {
-            errorsInBranch.isEMFError.add(false) // Инициализируем ошибки для новых источников ЭДС
+            // Инициализируем ошибки для новых источников ЭДС
+            errorsInBranch.isEMFError.add(false)
         }
         branch.emf.forEachIndexed { emfIndex, emf ->
             // Проверка ЭДС на ошибки
@@ -363,7 +364,8 @@ class BranchViewModel: ViewModel() {
 
 
     private fun String.isPositive(): Boolean {
-        return (this.toIntOrNull() ?: -1) > 0
+        val withDot = this.replace(",", ".")
+        return (withDot.toDoubleOrNull() ?: -1.0) >= 0
     }
 
 

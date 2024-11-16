@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -69,6 +72,10 @@ fun SolutionScreen(
         )
         StepThree(
             amount = components,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        StepFour(
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -276,11 +283,12 @@ private fun BranchSolutionEMF(
     summarizedEMF: Double,
     modifier: Modifier
 ) {
+    val emf = formatValue(summarizedEMF)
     Box(
         modifier = modifier
     ) {
         Text(
-            text = "EMF: $summarizedEMF V",
+            text = "EMF: $emf V",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -297,11 +305,12 @@ private fun BranchSolutionResistance(
     summarizedResistance: Double,
     modifier: Modifier
 ) {
+    val resistance = formatValue(summarizedResistance)
     Box(
         modifier = modifier
     ) {
         Text(
-            text = "Resistance: $summarizedResistance Ohm",
+            text = "Resistance: $resistance Ohm",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -349,6 +358,8 @@ private fun ListOfNodes(
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
+
+            Log.d("SolutionScreen:ListOfNodes", list.toString())
 
             if (list.size == 0) {
                 Text(
@@ -500,6 +511,112 @@ private fun AmountOfComponents(
 }
 
 
+@Composable
+private fun StepFour(
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+        text ="Step 4",
+        fontSize = 22.sp,
+        modifier = Modifier
+            .padding(vertical = 10.dp, horizontal = 20.dp)
+    )
+        Checks()
+    }
+}
+
+
+@Composable
+fun Checks() {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = Modifier.padding(horizontal = 20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = "Проверки",
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+            CircuitContinuous()
+            HasNoBridges()
+        }
+    }
+}
+
+
+@Composable
+private fun CircuitContinuous() {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Цепь замкнута",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xff4ccf00))
+            ) {
+                Icon(imageVector = Icons.Default.Done, contentDescription = "", tint = Color.White)
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun HasNoBridges() {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Цепь без мостов",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xff4ccf00))
+            ) {
+                Icon(imageVector = Icons.Default.Done, contentDescription = "", tint = Color.White)
+            }
+        }
+    }
+}
+
+
+
+
+
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenPreview() {
@@ -512,4 +629,49 @@ private fun SolutionScreenPreview() {
         listOfNodes,
         amountOfComponents
     )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepOnePreview() {
+    val branches = listOf(BranchResultUI())
+    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
+    val amountOfComponents = remember { mutableIntStateOf(3) }
+
+    StepOne(branches = branches, modifier = Modifier.fillMaxWidth())
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepTwoPreview() {
+    val branches = listOf(BranchResultUI())
+    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
+    val amountOfComponents = remember { mutableIntStateOf(3) }
+
+    StepTwo(list = listOfNodes, modifier = Modifier.fillMaxWidth())
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepThreePreview() {
+    val branches = listOf(BranchResultUI())
+    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
+    val amountOfComponents = remember { mutableIntStateOf(3) }
+
+    StepThree(amount = amountOfComponents, modifier = Modifier.fillMaxWidth())
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepFourPreview() {
+    val branches = listOf(BranchResultUI())
+    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
+    val amountOfComponents = remember { mutableIntStateOf(3) }
+
+    StepFour(modifier = Modifier.fillMaxWidth())
+
 }

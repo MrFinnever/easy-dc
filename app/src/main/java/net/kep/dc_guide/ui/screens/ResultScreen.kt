@@ -232,11 +232,6 @@ private fun DCValueCard(
     dcValue: Double,
     modifier: Modifier
 ) {
-    fun formatValue(dcValue: Double): String {
-        val newValue = if (dcValue < 0.0) "−${dcValue.absoluteValue}" else dcValue.toString()
-        return newValue.replace(".", ",")
-    }
-
     Card(
         shape = MaterialTheme.shapes.extraLarge,
         modifier = modifier
@@ -315,6 +310,17 @@ private fun CopyAllFAB(
             )
         }
     }
+}
+
+@Composable
+fun formatValue(value: Double): String {
+    var newValue = if (value < 0.0) "−${value.absoluteValue}" else value.toString()
+    newValue = newValue.replace(".", ",")
+
+    if (newValue.endsWith(",0"))
+        newValue = newValue.dropLast(2)
+
+    return newValue
 }
 
 

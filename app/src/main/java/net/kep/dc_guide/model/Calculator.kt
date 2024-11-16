@@ -84,7 +84,7 @@ fun getAllNodes(branchesUI: MutableList<BranchUI>): List<Int> {
     val branches = collectBranches(branchesUI)
     val ec = ElectricalCircuit(branches)
 
-    Log.d("Calculator:getAllNodes", ec.toString())
+    Log.d("Calculator:getAllNodes", ec.allNodes.toString())
 
     return ec.allNodes
 }
@@ -93,7 +93,7 @@ fun getConnectedComponentsCount(branchesUI: MutableList<BranchUI>): Int {
     val branches = collectBranches(branchesUI)
     val ec = ElectricalCircuit(branches)
 
-    Log.d("Calculator:getConnectedComponentsAmount", ec.toString())
+    Log.d("Calculator:getConnectedComponentsAmount", ec.connectedComponentsCount.toString())
 
     return ec.connectedComponentsCount
 }
