@@ -8,19 +8,23 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import net.kep.dc_guide.data.BranchResultUI
-import net.kep.dc_guide.data.BranchUI
-import net.kep.dc_guide.data.ErrorsInBranch
+import net.kep.dc_guide.data.calculator.BranchResultUI
+import net.kep.dc_guide.data.calculator.BranchUI
+import net.kep.dc_guide.data.calculator.ErrorsInBranch
+import net.kep.dc_guide.data.calculator.solution.BranchInCycle
+import net.kep.dc_guide.data.calculator.solution.CycleUI
 import net.kep.dc_guide.model.getAllNodes
 import net.kep.dc_guide.model.getConnectedComponentsCount
 import net.kep.dc_guide.model.getCurrents
+import net.kep.dc_guide.model.getCycleSet
 import net.kep.dc_guide.model.hasBridges
 import net.kep.dc_guide.model.isCircuitContinuous
+import net.kep.dcc.elements.CycleSet
 import net.kep.dcc.exceptions.CircuitHasBridgesException
 import net.kep.dcc.exceptions.CircuitIsNotContinuousException
 
 
-class BranchViewModel: ViewModel() {
+class CalculatorViewModel: ViewModel() {
 
     private val _branches = MutableStateFlow(mutableListOf(BranchUI()))
     val branches: StateFlow<MutableList<BranchUI>> = _branches.asStateFlow()
@@ -34,12 +38,17 @@ class BranchViewModel: ViewModel() {
     private val _amountOfComponents = MutableStateFlow(mutableIntStateOf(0))
     val amountOfComponents: StateFlow<MutableIntState> = _amountOfComponents.asStateFlow()
 
+    private val _allCycles = MutableStateFlow(listOf(CycleUI()))
+    val allCycles: StateFlow<List<CycleUI>> = _allCycles.asStateFlow()
+
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
 
     private val _showErrorAlert = MutableStateFlow(false)
     val showErrorAlert: StateFlow<Boolean> = _showErrorAlert.asStateFlow()
 
+
+    //==================== Branches ====================//
 
 
     fun addBranch() {
@@ -61,6 +70,10 @@ class BranchViewModel: ViewModel() {
             }.toMutableList()
     }
 
+
+    //==================== Check Branches ====================//
+
+
     fun validate() {
         resetErrors()
 
@@ -68,8 +81,6 @@ class BranchViewModel: ViewModel() {
         var oneBranch = false
         var hasErrors = false
         var ecNotContinuous = false
-
-
 
         // Проверка на недостаток ветвей (до обработки всех ветвей)
         if (_branches.value.size < 2) {
@@ -363,6 +374,9 @@ class BranchViewModel: ViewModel() {
     }
 
 
+    //==================== Support functions for checks ====================//
+
+
     private fun String.isPositive(): Boolean {
         val withDot = this.replace(",", ".")
         return (withDot.toDoubleOrNull() ?: -1.0) >= 0
@@ -380,6 +394,9 @@ class BranchViewModel: ViewModel() {
     }
 
 
+    //==================== Calculating ====================//
+
+
     fun makeResult(calcNavCon: NavController) {
         validate()
         Log.e("ERROR", "hasError: ${hasErrors()}")
@@ -389,6 +406,7 @@ class BranchViewModel: ViewModel() {
             calculate()
             getNodes()
             getComponentsAmount()
+            getCycle()
             calcNavCon.navigate(route = "result")
         }
     }
@@ -439,6 +457,9 @@ class BranchViewModel: ViewModel() {
     }
 
 
+    //==================== Error Alert ====================//
+
+
     private fun showErrorAlert() {
         _showErrorAlert.value = true
     }
@@ -446,6 +467,9 @@ class BranchViewModel: ViewModel() {
     fun hideErrorAlert() {
         _showErrorAlert.value = false
     }
+
+
+    //==================== Solution ====================//
 
 
     private fun getNodes() {
@@ -456,5 +480,51 @@ class BranchViewModel: ViewModel() {
     private fun getComponentsAmount() {
         val amount: Int = getConnectedComponentsCount(_branches.value)
         _amountOfComponents.value = mutableIntStateOf(amount)
+    }
+
+    private fun getCycle() {
+        val cycleSet = getCycleSet(_branches.value)
+
+        Log.d(
+            "CalculatorVM:getCycle",
+            "cycleSet: $cycleSet"
+        )
+
+        _allCycles.value = convertCycleSetToDataClass(cycleSet)
+
+        Log.d(
+            "CalculatorVM:getCycle",
+            "_allCycles.value: ${_allCycles.value}"
+        )
+    }
+
+    private fun convertCycleSetToDataClass(cycleSet: CycleSet?): List<CycleUI> {
+        Log.d(
+            "CalculatorVM:convertCycleSetToDataClass",
+            "cucleSet: $cycleSet"
+        )
+
+        val result = mutableListOf<CycleUI>()
+
+        if (cycleSet != null) {
+            for (cycle in cycleSet) {
+                val branchesInCycle = cycle.map { branchInCycle ->
+                    BranchInCycle(
+                        branchId = branchInCycle.branch().id(),
+                        isInverted = branchInCycle.reverse
+                    )
+                }
+                result.add(
+                    CycleUI(branches = branchesInCycle)
+                )
+            }
+        }
+
+        Log.d(
+            "CalculatorVM:convertCycleSetToDataClass",
+            "return List<cycleSet>: $result"
+        )
+
+        return result
     }
 }

@@ -1,8 +1,9 @@
 package net.kep.dc_guide.model
 
 import android.util.Log
-import net.kep.dc_guide.data.BranchUI
+import net.kep.dc_guide.data.calculator.BranchUI
 import net.kep.dcc.elements.Branch
+import net.kep.dcc.elements.CycleSet
 import net.kep.dcc.elements.ElectricalCircuit
 import net.kep.dcc.exceptions.CircuitHasBridgesException
 import net.kep.dcc.exceptions.CircuitIsNotContinuousException
@@ -96,4 +97,13 @@ fun getConnectedComponentsCount(branchesUI: MutableList<BranchUI>): Int {
     Log.d("Calculator:getConnectedComponentsAmount", ec.connectedComponentsCount.toString())
 
     return ec.connectedComponentsCount
+}
+
+fun getCycleSet(branchesUI: MutableList<BranchUI>): CycleSet? {
+    val branches = collectBranches(branchesUI)
+    val ec = ElectricalCircuit(branches)
+
+    Log.d("Calculator:getCycles", ec.cycleSet.toString())
+
+    return ec.cycleSet
 }

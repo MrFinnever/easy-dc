@@ -1,4 +1,4 @@
-package net.kep.dc_guide.data
+package net.kep.dc_guide.data.calculator
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf

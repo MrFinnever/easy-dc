@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
@@ -42,14 +43,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.kep.dc_guide.R
-import net.kep.dc_guide.data.BranchResultUI
+import net.kep.dc_guide.data.calculator.BranchResultUI
+import net.kep.dc_guide.data.calculator.solution.BranchInCycle
+import net.kep.dc_guide.data.calculator.solution.CycleUI
 
 
 @Composable
 fun SolutionScreen(
     branches: List<BranchResultUI>,
     listOfNodes: MutableList<Int>,
-    components: MutableIntState
+    components: MutableIntState,
+    listOfCycles: List<CycleUI>
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -76,6 +80,11 @@ fun SolutionScreen(
                 .fillMaxWidth()
         )
         StepFour(
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        StepFive(
+            cycles = listOfCycles,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -524,16 +533,16 @@ private fun StepFour(
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
     )
-        Checks()
+        ChecksCard()
     }
 }
 
 
 @Composable
-fun Checks() {
+fun ChecksCard() {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
-        modifier = Modifier.padding(horizontal = 20.dp)
+        modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
     ) {
         Column(
             modifier = Modifier.padding(10.dp)
@@ -614,7 +623,170 @@ private fun HasNoBridges() {
 }
 
 
+@Composable
+private fun StepFive(
+    cycles: List<CycleUI>,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text ="Step 5",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+        CycleCards(
+            cycles = cycles,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+}
 
+
+@Composable
+private fun CycleCards(
+    cycles: List<CycleUI>,
+    modifier: Modifier
+) {
+    Box(
+        modifier = modifier
+    ) {
+        if (cycles[0].branches.isEmpty()) {
+            Card(
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 20.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Нет циклов для решения",
+                    fontSize = 22.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+        else {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth()
+            ) {
+                for (i in cycles.indices) {
+                    CycleCard(
+                        cycleIndex = i,
+                        cycle = cycles[i],
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 10.dp)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+
+@Composable
+private fun CycleCard(
+    cycleIndex: Int,
+    cycle: CycleUI,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Цикл ${cycleIndex+1}",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 10.dp)
+                    .fillMaxWidth()
+            )
+
+            Log.d("SolutionScreen:CycleCard",
+                "Cycle Index: $cycleIndex\n" +
+                    "Cycle: $cycle")
+
+            cycle.branches.forEach { branch  ->
+                CycleComponentCard(
+                    branchID = branch.branchId,
+                    isInverted = branch.isInverted,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun CycleComponentCard(
+    branchID: Int,
+    isInverted: Boolean,
+    modifier: Modifier
+) {
+    Card(
+        modifier = modifier
+    ) {
+        Column {
+            Text(
+                text = "Ветвь $branchID",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 10.dp, top = 10.dp)
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Инвертирована:",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 10.dp, top = 10.dp)
+                )
+
+                if (isInverted) {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 10.dp, top = 10.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFF81C784))
+                    ) {
+                        Icon(imageVector = Icons.Default.Done, contentDescription = "", tint = Color.White)
+                    }
+                }
+                else {
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 10.dp, top = 10.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFFEF9A9A))
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "", tint = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
 
 
 @Preview(showBackground = true)
@@ -623,11 +795,13 @@ private fun SolutionScreenPreview() {
     val branches = listOf(BranchResultUI())
     val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
     val amountOfComponents = remember { mutableIntStateOf(3) }
+    val listOfCycles = listOf(CycleUI())
 
     SolutionScreen(
         branches,
         listOfNodes,
-        amountOfComponents
+        amountOfComponents,
+        listOfCycles
     )
 }
 
@@ -674,4 +848,17 @@ private fun SolutionScreenStepFourPreview() {
 
     StepFour(modifier = Modifier.fillMaxWidth())
 
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepFivePreview() {
+    val branchesSolution = listOf<BranchInCycle>(BranchInCycle(), BranchInCycle(2, true))
+    val listOfCycles = listOf(CycleUI(branchesSolution))
+
+    StepFive(
+        cycles = listOfCycles,
+        modifier = Modifier
+            .fillMaxWidth()
+    )
 }

@@ -1,4 +1,4 @@
-package net.kep.dc_guide.data
+package net.kep.dc_guide.data.settings
 
 import android.content.Context
 import androidx.datastore.preferences.core.intPreferencesKey

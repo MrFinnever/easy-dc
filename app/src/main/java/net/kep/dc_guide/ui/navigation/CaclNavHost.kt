@@ -10,13 +10,13 @@ import net.kep.dc_guide.ui.screens.CalcScreen
 import net.kep.dc_guide.ui.screens.GreetingScreen
 import net.kep.dc_guide.ui.screens.HelpScreen
 import net.kep.dc_guide.ui.screens.ResultScreen
-import net.kep.dc_guide.ui.viewmodel.BranchViewModel
+import net.kep.dc_guide.ui.viewmodel.CalculatorViewModel
 
 @Composable
 fun CalcNavHost(
     mainNavCon: NavController
 ) {
-    val branchViewModel: BranchViewModel = viewModel()
+    val calculatorViewModel: CalculatorViewModel = viewModel()
     val calcNavCon = rememberNavController()
 
     NavHost(
@@ -30,13 +30,13 @@ fun CalcNavHost(
             )
         }
         composable(NavRoutes.Calculator.route) {
-            CalcScreen(branchViewModel, calcNavCon)
+            CalcScreen(calculatorViewModel, calcNavCon)
         }
         composable(NavRoutes.Help.route) {
             HelpScreen(calcNavCon)
         }
         composable(NavRoutes.Result.route) {
-            ResultScreen(branchViewModel, calcNavCon)
+            ResultScreen(calculatorViewModel, calcNavCon)
         }
     }
 }

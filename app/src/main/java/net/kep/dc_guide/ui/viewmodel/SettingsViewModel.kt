@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import net.kep.dc_guide.data.SettingsKeys
-import net.kep.dc_guide.data.dataStore
+import net.kep.dc_guide.data.settings.SettingsKeys
+import net.kep.dc_guide.data.settings.dataStore
 import net.kep.dc_guide.ui.theme.ThemeMode
 
 class SettingsViewModel(context: Context) {

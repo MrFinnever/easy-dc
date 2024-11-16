@@ -46,19 +46,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.dc_guide.R
-import net.kep.dc_guide.data.BranchUI
-import net.kep.dc_guide.data.ErrorsInBranch
-import net.kep.dc_guide.ui.viewmodel.BranchViewModel
+import net.kep.dc_guide.data.calculator.BranchUI
+import net.kep.dc_guide.data.calculator.ErrorsInBranch
+import net.kep.dc_guide.ui.viewmodel.CalculatorViewModel
 
 
 @Composable
 fun CalcScreen(
-    branchViewModel: BranchViewModel = viewModel(),
+    calculatorViewModel: CalculatorViewModel = viewModel(),
     calcNavCon: NavController
 ) {
-    val branches by branchViewModel.branches.collectAsState()
-    val errorsInBranch by branchViewModel.errorsInBranches.collectAsState()
-    val showErrorAlert by branchViewModel.showErrorAlert.collectAsState()
+    val branches by calculatorViewModel.branches.collectAsState()
+    val errorsInBranch by calculatorViewModel.errorsInBranches.collectAsState()
+    val showErrorAlert by calculatorViewModel.showErrorAlert.collectAsState()
 
     Scaffold(
         topBar = {
@@ -69,7 +69,7 @@ fun CalcScreen(
         floatingActionButton = {
             ResultButton(
                 calcNavCon = calcNavCon,
-                branchViewModel = branchViewModel
+                calculatorViewModel = calculatorViewModel
             )
         }
     ) {
@@ -88,10 +88,10 @@ fun CalcScreen(
                     isRemovable = index > 0,
                     onRemove = {
                         if (index > 0) {
-                            branchViewModel.removeBranch(index)
+                            calculatorViewModel.removeBranch(index)
                         }
                     },
-                    branchViewModel = branchViewModel,
+                    calculatorViewModel = calculatorViewModel,
                     errorsInBranch = error,
                     modifier = if (index > 0) {
                         Modifier
@@ -105,13 +105,13 @@ fun CalcScreen(
             }
 
             AddBranchButton(
-                vm = branchViewModel,
+                vm = calculatorViewModel,
                 modifier = Modifier.fillMaxWidth()
             )
 
             if (showErrorAlert) {
                 ErrorAlert(
-                    branchViewModel = branchViewModel,
+                    calculatorViewModel = calculatorViewModel,
                     errorsInBranchList = errorsInBranch
                 )
             }
@@ -161,11 +161,11 @@ fun CalcTopAppBar(
 @Composable
 fun ResultButton(
     calcNavCon: NavController,
-    branchViewModel: BranchViewModel
+    calculatorViewModel: CalculatorViewModel
 ) {
     ExtendedFloatingActionButton(
         onClick = {
-            branchViewModel.makeResult(calcNavCon = calcNavCon)
+            calculatorViewModel.makeResult(calcNavCon = calcNavCon)
         }
     ) {
         Row(
@@ -190,7 +190,7 @@ fun ResultButton(
 
 @Composable
 fun AddBranchButton(
-    vm: BranchViewModel,
+    vm: CalculatorViewModel,
     modifier: Modifier
 ) {
 
@@ -227,7 +227,7 @@ fun BranchCard(
     isRemovable: Boolean,
     onRemove: () -> Unit,
     errorsInBranch: ErrorsInBranch,
-    branchViewModel: BranchViewModel,
+    calculatorViewModel: CalculatorViewModel,
     modifier: Modifier
 ) {
     Card(
@@ -250,7 +250,7 @@ fun BranchCard(
                 input = branchUI.input,
                 output = branchUI.output,
                 errorsInBranch = errorsInBranch,
-                branchViewModel = branchViewModel,
+                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -261,7 +261,7 @@ fun BranchCard(
                 placeholder = stringResource(id = R.string.volt),
                 textFields = branchUI.emf,
                 fieldErrors = errorsInBranch.isEMFError,
-                branchViewModel = branchViewModel,
+                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -272,7 +272,7 @@ fun BranchCard(
                 placeholder = stringResource(id = R.string.ohm),
                 textFields = branchUI.resistors,
                 fieldErrors = errorsInBranch.isResistorsError,
-                branchViewModel = branchViewModel,
+                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -319,7 +319,7 @@ fun BranchCardLabel(
 fun BranchInputOutput(
     input: MutableState<String>,
     output: MutableState<String>,
-    branchViewModel: BranchViewModel,
+    calculatorViewModel: CalculatorViewModel,
     errorsInBranch: ErrorsInBranch,
     modifier: Modifier = Modifier
 ) {
@@ -394,7 +394,7 @@ fun BranchMultiComponent(
     placeholder: String,
     textFields: SnapshotStateList<String>,
     fieldErrors: SnapshotStateList<Boolean>,
-    branchViewModel: BranchViewModel,
+    calculatorViewModel: CalculatorViewModel,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -465,11 +465,11 @@ fun BranchMultiComponent(
 
 @Composable
 fun ErrorAlert(
-    branchViewModel: BranchViewModel,
+    calculatorViewModel: CalculatorViewModel,
     errorsInBranchList: List<ErrorsInBranch>
 ) {
     AlertDialog(
-        onDismissRequest = { branchViewModel.hideErrorAlert() },
+        onDismissRequest = { calculatorViewModel.hideErrorAlert() },
         title = { Text(text = "Ошибка") },
         text = {
             Column(
@@ -495,7 +495,7 @@ fun ErrorAlert(
 
         },
         confirmButton = {
-            Button(onClick = { branchViewModel.hideErrorAlert() }) {
+            Button(onClick = { calculatorViewModel.hideErrorAlert() }) {
                 Text(text = "OK")
             }
         }
@@ -506,10 +506,10 @@ fun ErrorAlert(
 @Preview
 @Composable
 fun CalcScreenPreview() {
-    val branchViewModel = BranchViewModel()
+    val calculatorViewModel = CalculatorViewModel()
     val calcNav = rememberNavController()
     CalcScreen(
-        branchViewModel,
+        calculatorViewModel,
         calcNav
     )
 }

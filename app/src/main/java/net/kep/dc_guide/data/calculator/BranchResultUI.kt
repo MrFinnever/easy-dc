@@ -1,4 +1,4 @@
-package net.kep.dc_guide.data
+package net.kep.dc_guide.data.calculator
 
 data class BranchResultUI (
     val id: Int = 1,

@@ -44,8 +44,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.dc_guide.R
-import net.kep.dc_guide.data.BranchResultUI
-import net.kep.dc_guide.ui.viewmodel.BranchViewModel
+import net.kep.dc_guide.data.calculator.BranchResultUI
+import net.kep.dc_guide.ui.viewmodel.CalculatorViewModel
 import kotlin.math.absoluteValue
 
 
@@ -57,12 +57,13 @@ enum class Tabs {
 
 @Composable
 fun ResultScreen(
-    branchViewModel: BranchViewModel = viewModel(),
+    calculatorViewModel: CalculatorViewModel = viewModel(),
     calcNavCon: NavController
 ) {
-    val branches by branchViewModel.result.collectAsState()
-    val listOfNodes by branchViewModel.allNodes.collectAsState()
-    val amountOfComponents by branchViewModel.amountOfComponents.collectAsState()
+    val branches by calculatorViewModel.result.collectAsState()
+    val listOfNodes by calculatorViewModel.allNodes.collectAsState()
+    val amountOfComponents by calculatorViewModel.amountOfComponents.collectAsState()
+    val listOfCycles by calculatorViewModel.allCycles.collectAsState()
 
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
@@ -102,7 +103,12 @@ fun ResultScreen(
                     ResultCards(branches)
                 }
                 Tabs.SOLUTION -> {
-                    SolutionScreen(branches, listOfNodes, amountOfComponents)
+                    SolutionScreen(
+                        branches,
+                        listOfNodes,
+                        amountOfComponents,
+                        listOfCycles
+                    )
                 }
             }
 
@@ -239,7 +245,7 @@ private fun DCValueCard(
     ) {
         if (dcValue < 0) dcValue.toString().replace("-", "－")
         Text(
-            text = "I = " + formatValue(dcValue),
+            text = "I = " + formatValue(dcValue) + " A",
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -327,10 +333,10 @@ fun formatValue(value: Double): String {
 @Preview
 @Composable
 private fun ResultScreenPreview() {
-    val branchViewModel = BranchViewModel()
+    val calculatorViewModel = CalculatorViewModel()
     val calcNav = rememberNavController()
     ResultScreen(
-        branchViewModel,
+        calculatorViewModel,
         calcNav
     )
 }
