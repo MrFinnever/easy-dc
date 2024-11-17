@@ -2,12 +2,17 @@ package net.kep.dc_guide.model
 
 import android.util.Log
 import net.kep.dc_guide.data.calculator.BranchUI
+import net.kep.dc_guide.data.calculator.solution.sle.Cols
+import net.kep.dc_guide.data.calculator.solution.sle.FreeFactors
+import net.kep.dc_guide.data.calculator.solution.sle.Matrix
+import net.kep.dc_guide.data.calculator.solution.sle.Rows
+import net.kep.dc_guide.data.calculator.solution.sle.SLEData
 import net.kep.dcc.elements.Branch
 import net.kep.dcc.elements.CycleSet
 import net.kep.dcc.elements.ElectricalCircuit
 import net.kep.dcc.exceptions.CircuitHasBridgesException
 import net.kep.dcc.exceptions.CircuitIsNotContinuousException
-
+import net.kep.dcc.util.SLE
 
 private fun collectBranches(branchesUI: MutableList<BranchUI>): ArrayList<Branch> {
     val branches = ArrayList<Branch>()
@@ -99,11 +104,39 @@ fun getConnectedComponentsCount(branchesUI: MutableList<BranchUI>): Int {
     return ec.connectedComponentsCount
 }
 
-fun getCycleSet(branchesUI: MutableList<BranchUI>): CycleSet? {
+fun getCycleSet(branchesUI: MutableList<BranchUI>): CycleSet {
     val branches = collectBranches(branchesUI)
     val ec = ElectricalCircuit(branches)
 
     Log.d("Calculator:getCycles", ec.cycleSet.toString())
 
     return ec.cycleSet
+}
+
+fun getSLEMatrix(branchesUI: MutableList<BranchUI>): SLEData {
+    val branches = collectBranches(branchesUI)
+    val ec = ElectricalCircuit(branches)
+    val cycleSet = ec.cycleSet
+    val sle = SLE(cycleSet, ec)
+
+    val matrixSLE = sle.matrixSLE
+    val freeFactorsSLE = sle.vectorFreeFactors
+
+
+    val matrixRows = List(matrixSLE.numRows) { row ->
+        Cols(col = List(matrixSLE.numCols) { col ->
+            matrixSLE.get(row, col)
+        })
+    }
+    val rows = Rows(rows = matrixRows)
+
+    // Преобразование вектора свободных членов в список
+    val freeFactorsList = List(freeFactorsSLE.numRows) { row ->
+        freeFactorsSLE.get(row, 0)
+    }
+
+    val matrix = Matrix(rows)
+    val freeFactors = FreeFactors(freeFactorsList)
+
+    return SLEData(matrix, freeFactors)
 }

@@ -1,6 +1,7 @@
 package net.kep.dc_guide.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,6 +65,7 @@ fun ResultScreen(
     val listOfNodes by calculatorViewModel.allNodes.collectAsState()
     val amountOfComponents by calculatorViewModel.amountOfComponents.collectAsState()
     val listOfCycles by calculatorViewModel.allCycles.collectAsState()
+    val sle by calculatorViewModel.sle.collectAsState()
 
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
@@ -107,7 +109,8 @@ fun ResultScreen(
                         branches,
                         listOfNodes,
                         amountOfComponents,
-                        listOfCycles
+                        listOfCycles,
+                        sle
                     )
                 }
             }
@@ -245,9 +248,10 @@ private fun DCValueCard(
     ) {
         if (dcValue < 0) dcValue.toString().replace("-", "－")
         Text(
-            text = "I = " + formatValue(dcValue) + " A",
+            text = "I = " + formatDoubleToString(dcValue) + " A",
             fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.horizontalScroll(rememberScrollState())
         )
     }
 }
@@ -319,7 +323,7 @@ private fun CopyAllFAB(
 }
 
 @Composable
-fun formatValue(value: Double): String {
+fun formatDoubleToString(value: Double): String {
     var newValue = if (value < 0.0) "−${value.absoluteValue}" else value.toString()
     newValue = newValue.replace(".", ",")
 

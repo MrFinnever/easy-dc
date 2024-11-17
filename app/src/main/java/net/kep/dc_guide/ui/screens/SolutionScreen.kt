@@ -2,13 +2,16 @@ package net.kep.dc_guide.ui.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,7 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,6 +51,11 @@ import net.kep.dc_guide.R
 import net.kep.dc_guide.data.calculator.BranchResultUI
 import net.kep.dc_guide.data.calculator.solution.BranchInCycle
 import net.kep.dc_guide.data.calculator.solution.CycleUI
+import net.kep.dc_guide.data.calculator.solution.sle.Cols
+import net.kep.dc_guide.data.calculator.solution.sle.FreeFactors
+import net.kep.dc_guide.data.calculator.solution.sle.Matrix
+import net.kep.dc_guide.data.calculator.solution.sle.Rows
+import net.kep.dc_guide.data.calculator.solution.sle.SLEData
 
 
 @Composable
@@ -53,7 +63,8 @@ fun SolutionScreen(
     branches: List<BranchResultUI>,
     listOfNodes: MutableList<Int>,
     components: MutableIntState,
-    listOfCycles: List<CycleUI>
+    listOfCycles: List<CycleUI>,
+    sle: SLEData
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -85,6 +96,11 @@ fun SolutionScreen(
         )
         StepFive(
             cycles = listOfCycles,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        StepSix(
+            sle = sle,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -292,7 +308,7 @@ private fun BranchSolutionEMF(
     summarizedEMF: Double,
     modifier: Modifier
 ) {
-    val emf = formatValue(summarizedEMF)
+    val emf = formatDoubleToString(summarizedEMF)
     Box(
         modifier = modifier
     ) {
@@ -314,7 +330,7 @@ private fun BranchSolutionResistance(
     summarizedResistance: Double,
     modifier: Modifier
 ) {
-    val resistance = formatValue(summarizedResistance)
+    val resistance = formatDoubleToString(summarizedResistance)
     Box(
         modifier = modifier
     ) {
@@ -658,7 +674,6 @@ private fun CycleCards(
             Card(
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 20.dp)
                     .fillMaxWidth()
             ) {
                 Text(
@@ -672,7 +687,7 @@ private fun CycleCards(
         else {
             Column(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
+
                     .fillMaxWidth()
             ) {
                 for (i in cycles.indices) {
@@ -680,8 +695,7 @@ private fun CycleCards(
                         cycleIndex = i,
                         cycle = cycles[i],
                         modifier = Modifier
-                            .padding(horizontal = 20.dp)
-                            .padding(bottom = 10.dp)
+                            .padding(vertical = 10.dp, horizontal = 20.dp)
                             .fillMaxWidth()
                     )
                 }
@@ -789,6 +803,167 @@ private fun CycleComponentCard(
 }
 
 
+@Composable
+private fun StepSix(
+    sle: SLEData,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text ="Step 6",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+        SLECard(
+            sle = sle,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+    }
+}
+
+
+@Composable
+private fun SLECard(
+    sle: SLEData,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = "Система линейных уравнений",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 10.dp)
+                    .fillMaxWidth()
+            )
+            SLEText(
+                sle = sle,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+            )
+        }
+    }
+}
+
+@Composable
+private fun SLEText(
+    sle: SLEData,
+    modifier: Modifier
+) {
+    val rowCount = sle.matrix.value.rows.size
+    val dividerHeight = (rowCount * 32).dp
+    Row(
+        modifier = modifier
+    ) {
+        Canvas(
+            modifier = Modifier
+                .padding(start = 2.dp, end = 10.dp)
+                .height(dividerHeight)
+        ) {
+            val height = size.height
+            drawLine(
+                color = Color.Black,
+                start = Offset(x = size.width / 2, y = 0f),
+                end = Offset(x = size.width / 2, y = height),
+                strokeWidth = 6f,
+                cap = StrokeCap.Round
+            )
+        }
+
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+
+            sle.matrix.value.rows.forEachIndexed { rowIndex, row ->
+                val equation = buildString {
+                    var isFirst = false
+                    row.col.forEachIndexed { colIndex, coefficient ->
+
+                        if (colIndex == 0) isFirst = true
+
+                        if (coefficient != 0.0) {
+                            Log.d(
+                                "SolutionScreen:SLEText",
+                                "RowIndex: $rowIndex, Row: $row,\n" +
+                                        "ColIndex: $colIndex, Coefficient: $coefficient"
+                            )
+
+                            append(formatCoefficient(coefficient, colIndex, isFirst))
+                            append("×i${colIndex + 1}")
+
+                            isFirst = false
+                        }
+                    }
+
+                    val freeFactor = sle.freeFactors.value[rowIndex]
+                    if (freeFactor < 0)
+                        append(" = −${formatNumber(-freeFactor)}")
+                    else
+                        append(" = ${formatNumber(freeFactor)}")
+                }
+
+                Text(
+                    text = equation,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun formatCoefficient(coefficient: Double, colIndex: Int, isFirst: Boolean): String {
+    var result = ""
+
+    result = when {
+        colIndex == 0 -> {
+            when {
+                coefficient < 0 -> "−${formatNumber(-coefficient)}"
+                coefficient > 0 ->  formatNumber(coefficient)
+                else -> ""
+            }
+        }
+        colIndex != 0 -> {
+            when {
+                (coefficient < 0 && isFirst) -> "−${formatNumber(-coefficient)}"
+                (coefficient > 0 && isFirst) -> formatNumber(coefficient)
+                coefficient < 0 -> " − ${formatNumber(-coefficient)}"
+                coefficient > 0 -> " + ${formatNumber(coefficient)}"
+                else -> ""
+            }
+        }
+        else -> ""
+    }
+
+    return result
+}
+
+// Функция для форматирования числа, убирая .0, если число целое
+private fun formatNumber(number: Double): String {
+    return if (number % 1.0 == 0.0) {
+        number.toInt().toString() // Преобразуем в целое и убираем .0
+    } else {
+        "%.1f".format(number).replace(".", ",") // Форматируем с одной дробной частью и заменяем точку на запятую
+    }
+}
+
+
+
+
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenPreview() {
@@ -801,7 +976,15 @@ private fun SolutionScreenPreview() {
         branches,
         listOfNodes,
         amountOfComponents,
-        listOfCycles
+        listOfCycles,
+        SLEData(
+            Matrix(
+                Rows(
+                    listOf(Cols(listOf()))
+                )
+            ),
+            FreeFactors(listOf())
+        )
     )
 }
 
@@ -810,8 +993,6 @@ private fun SolutionScreenPreview() {
 @Composable
 private fun SolutionScreenStepOnePreview() {
     val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
-    val amountOfComponents = remember { mutableIntStateOf(3) }
 
     StepOne(branches = branches, modifier = Modifier.fillMaxWidth())
 
@@ -820,9 +1001,7 @@ private fun SolutionScreenStepOnePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenStepTwoPreview() {
-    val branches = listOf(BranchResultUI())
     val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
-    val amountOfComponents = remember { mutableIntStateOf(3) }
 
     StepTwo(list = listOfNodes, modifier = Modifier.fillMaxWidth())
 
@@ -831,8 +1010,6 @@ private fun SolutionScreenStepTwoPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenStepThreePreview() {
-    val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
     val amountOfComponents = remember { mutableIntStateOf(3) }
 
     StepThree(amount = amountOfComponents, modifier = Modifier.fillMaxWidth())
@@ -842,9 +1019,6 @@ private fun SolutionScreenStepThreePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenStepFourPreview() {
-    val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
-    val amountOfComponents = remember { mutableIntStateOf(3) }
 
     StepFour(modifier = Modifier.fillMaxWidth())
 
@@ -853,11 +1027,35 @@ private fun SolutionScreenStepFourPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SolutionScreenStepFivePreview() {
-    val branchesSolution = listOf<BranchInCycle>(BranchInCycle(), BranchInCycle(2, true))
+    val branchesSolution = listOf(BranchInCycle(), BranchInCycle(2, true))
     val listOfCycles = listOf(CycleUI(branchesSolution))
 
     StepFive(
         cycles = listOfCycles,
+        modifier = Modifier
+            .fillMaxWidth()
+    )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepSixPreview() {
+
+    StepSix(
+        sle = SLEData(
+            Matrix(
+                Rows(
+                    listOf(
+                        Cols(listOf(-1.0, 0.0, 3.0)),
+                        Cols(listOf(-4.0, -5.0, 6.0)),
+                        Cols(listOf(-4.0, -5.0, 6.0)),
+                        Cols(listOf(12.0, -5.0, 6.0))
+                    )
+                )
+            ),
+            FreeFactors(listOf(1.0, -2.0, 3.0, -4.0))
+        ),
         modifier = Modifier
             .fillMaxWidth()
     )

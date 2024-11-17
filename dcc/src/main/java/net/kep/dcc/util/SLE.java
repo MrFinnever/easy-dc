@@ -49,4 +49,13 @@ public class SLE {
 
         return formatter.toString();
     }
+
+    public SimpleMatrix getMatrixSLE() {
+        return matrixSLE;
+    }
+
+    public SimpleMatrix getVectorFreeFactors() {
+        return vectorFreeFactors;
+    }
 }
+

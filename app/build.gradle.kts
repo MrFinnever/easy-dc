@@ -84,7 +84,7 @@ dependencies {
     //Zoomable
     implementation("net.engawapg.lib:zoomable:1.6.2")
     implementation("io.github.grizzi91:bouquet:1.1.2")
-
+    implementation("org.ejml:ejml-simple:0.43.1")
     implementation(project(":dcc"))
 
 

@@ -13,10 +13,16 @@ import net.kep.dc_guide.data.calculator.BranchUI
 import net.kep.dc_guide.data.calculator.ErrorsInBranch
 import net.kep.dc_guide.data.calculator.solution.BranchInCycle
 import net.kep.dc_guide.data.calculator.solution.CycleUI
+import net.kep.dc_guide.data.calculator.solution.sle.Cols
+import net.kep.dc_guide.data.calculator.solution.sle.FreeFactors
+import net.kep.dc_guide.data.calculator.solution.sle.Matrix
+import net.kep.dc_guide.data.calculator.solution.sle.Rows
+import net.kep.dc_guide.data.calculator.solution.sle.SLEData
 import net.kep.dc_guide.model.getAllNodes
 import net.kep.dc_guide.model.getConnectedComponentsCount
 import net.kep.dc_guide.model.getCurrents
 import net.kep.dc_guide.model.getCycleSet
+import net.kep.dc_guide.model.getSLEMatrix
 import net.kep.dc_guide.model.hasBridges
 import net.kep.dc_guide.model.isCircuitContinuous
 import net.kep.dcc.elements.CycleSet
@@ -40,6 +46,18 @@ class CalculatorViewModel: ViewModel() {
 
     private val _allCycles = MutableStateFlow(listOf(CycleUI()))
     val allCycles: StateFlow<List<CycleUI>> = _allCycles.asStateFlow()
+
+    private val _sle= MutableStateFlow(
+        SLEData(
+            Matrix(
+                Rows(
+                    listOf(Cols(listOf()))
+                )
+            ),
+            FreeFactors(listOf())
+        )
+    )
+    val sle: StateFlow<SLEData> = _sle.asStateFlow()
 
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
@@ -407,6 +425,7 @@ class CalculatorViewModel: ViewModel() {
             getNodes()
             getComponentsAmount()
             getCycle()
+            getSLE()
             calcNavCon.navigate(route = "result")
         }
     }
@@ -527,4 +546,14 @@ class CalculatorViewModel: ViewModel() {
 
         return result
     }
+
+    private fun getSLE() {
+        _sle.value = getSLEMatrix(_branches.value)
+        Log.d(
+            "CalculatorVM:getSLE",
+            "SLE: ${_sle.value}"
+        )
+    }
+
+
 }
