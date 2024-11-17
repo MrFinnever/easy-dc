@@ -66,6 +66,7 @@ fun ResultScreen(
     val amountOfComponents by calculatorViewModel.amountOfComponents.collectAsState()
     val listOfCycles by calculatorViewModel.allCycles.collectAsState()
     val sle by calculatorViewModel.sle.collectAsState()
+    val contourCurrents by calculatorViewModel.contourCurrents.collectAsState()
 
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
@@ -110,7 +111,8 @@ fun ResultScreen(
                         listOfNodes,
                         amountOfComponents,
                         listOfCycles,
-                        sle
+                        sle,
+                        contourCurrents
                     )
                 }
             }
@@ -121,7 +123,7 @@ fun ResultScreen(
 
 
 @Composable
-private fun ResultCards(branches: List<BranchResultUI>) {
+fun ResultCards(branches: List<BranchResultUI>) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -168,7 +170,7 @@ private fun ResultTopAppBar(
 
 
 @Composable
-private fun ResultCard(
+fun ResultCard(
     branch: BranchResultUI,
     modifier: Modifier
 ) {

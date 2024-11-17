@@ -122,7 +122,6 @@ fun getSLEMatrix(branchesUI: MutableList<BranchUI>): SLEData {
     val matrixSLE = sle.matrixSLE
     val freeFactorsSLE = sle.vectorFreeFactors
 
-
     val matrixRows = List(matrixSLE.numRows) { row ->
         Cols(col = List(matrixSLE.numCols) { col ->
             matrixSLE.get(row, col)
@@ -130,7 +129,6 @@ fun getSLEMatrix(branchesUI: MutableList<BranchUI>): SLEData {
     }
     val rows = Rows(rows = matrixRows)
 
-    // Преобразование вектора свободных членов в список
     val freeFactorsList = List(freeFactorsSLE.numRows) { row ->
         freeFactorsSLE.get(row, 0)
     }
@@ -139,4 +137,11 @@ fun getSLEMatrix(branchesUI: MutableList<BranchUI>): SLEData {
     val freeFactors = FreeFactors(freeFactorsList)
 
     return SLEData(matrix, freeFactors)
+}
+
+fun getContCurrents(branchesUI: MutableList<BranchUI>): List<Double> {
+    val branches = collectBranches(branchesUI)
+    val ec = ElectricalCircuit(branches)
+
+    return ec.contourCurrents
 }

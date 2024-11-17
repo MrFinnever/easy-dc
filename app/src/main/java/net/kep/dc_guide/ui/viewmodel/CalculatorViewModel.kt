@@ -20,6 +20,7 @@ import net.kep.dc_guide.data.calculator.solution.sle.Rows
 import net.kep.dc_guide.data.calculator.solution.sle.SLEData
 import net.kep.dc_guide.model.getAllNodes
 import net.kep.dc_guide.model.getConnectedComponentsCount
+import net.kep.dc_guide.model.getContCurrents
 import net.kep.dc_guide.model.getCurrents
 import net.kep.dc_guide.model.getCycleSet
 import net.kep.dc_guide.model.getSLEMatrix
@@ -58,6 +59,9 @@ class CalculatorViewModel: ViewModel() {
         )
     )
     val sle: StateFlow<SLEData> = _sle.asStateFlow()
+
+    private val _contourCurrents = MutableStateFlow(mutableListOf<Double>())
+    val contourCurrents: StateFlow<MutableList<Double>> = _contourCurrents.asStateFlow()
 
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
@@ -426,6 +430,7 @@ class CalculatorViewModel: ViewModel() {
             getComponentsAmount()
             getCycle()
             getSLE()
+            getContourCurrents()
             calcNavCon.navigate(route = "result")
         }
     }
@@ -555,5 +560,8 @@ class CalculatorViewModel: ViewModel() {
         )
     }
 
-
+    private fun getContourCurrents() {
+        val listOfContourCurrents: List<Double> = getContCurrents(_branches.value)
+        _contourCurrents.value = listOfContourCurrents.toMutableList()
+    }
 }

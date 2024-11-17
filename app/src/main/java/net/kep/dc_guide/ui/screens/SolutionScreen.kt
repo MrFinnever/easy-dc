@@ -64,7 +64,8 @@ fun SolutionScreen(
     listOfNodes: MutableList<Int>,
     components: MutableIntState,
     listOfCycles: List<CycleUI>,
-    sle: SLEData
+    sle: SLEData,
+    contourCurrents: MutableList<Double>
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -104,6 +105,16 @@ fun SolutionScreen(
             modifier = Modifier
                 .fillMaxWidth()
         )
+        StepSeven(
+            contourCurrents = contourCurrents,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        Result(
+            branches = branches,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
     }
 }
 
@@ -118,7 +129,9 @@ private fun StepOne(
         Text(
             text ="Step 1 - Collect Branches",
             fontSize = 22.sp,
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .padding(vertical = 10.dp, horizontal = 20.dp)
         )
 
         branches.forEachIndexed { index, branchResultUI ->
@@ -131,8 +144,7 @@ private fun StepOne(
                 id = index+1,
                 branch = branchResultUI,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 10.dp)
+                    .padding(vertical = 10.dp, horizontal = 20.dp)
                     .fillMaxWidth()
             )
         }
@@ -726,7 +738,7 @@ private fun CycleCard(
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp)
+                    .padding(start = 10.dp)
                     .fillMaxWidth()
             )
 
@@ -843,7 +855,7 @@ private fun SLECard(
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp)
+                    .padding(start = 10.dp)
                     .fillMaxWidth()
             )
             SLEText(
@@ -952,16 +964,122 @@ private fun formatCoefficient(coefficient: Double, colIndex: Int, isFirst: Boole
     return result
 }
 
+
 // Функция для форматирования числа, убирая .0, если число целое
+@Composable
 private fun formatNumber(number: Double): String {
     return if (number % 1.0 == 0.0) {
-        number.toInt().toString() // Преобразуем в целое и убираем .0
+        // Убираем .0 у чисел
+        number.toInt().toString()
     } else {
-        "%.1f".format(number).replace(".", ",") // Форматируем с одной дробной частью и заменяем точку на запятую
+        "%.1f".format(number).replace(".", ",")
     }
 }
 
 
+@Composable
+private fun StepSeven(
+    contourCurrents: MutableList<Double>,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text ="Step 7",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+        ContourCurrentsCard(
+            contourCurrents = contourCurrents,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+                .fillMaxWidth()
+        )
+    }
+}
+
+
+@Composable
+private fun ContourCurrentsCard(
+    contourCurrents: MutableList<Double>,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Контурные токи",
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+            
+            contourCurrents.forEach { current ->
+                ContourCurrent(
+                    current = current,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ContourCurrent(
+    current: Double,
+    modifier: Modifier
+) {
+    Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        modifier = modifier
+    ) {
+        Text(
+            text = "I = ${formatDoubleToString(current)} A",
+            fontSize = 22.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(start = 10.dp)
+        )
+    }
+}
+
+
+@Composable
+fun Result(
+    branches: List<BranchResultUI>,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+
+        Text(
+            text = "Result",
+            fontSize = 22.sp,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+
+        branches.forEach {branch ->
+            ResultCard(
+                branch = branch,
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 20.dp)
+            )
+        }
+    }
+}
 
 
 @Preview(showBackground = true)
@@ -971,21 +1089,25 @@ private fun SolutionScreenPreview() {
     val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
     val amountOfComponents = remember { mutableIntStateOf(3) }
     val listOfCycles = listOf(CycleUI())
+    val contCurrents = mutableListOf(1.2, 23.4, 4.0)
 
-    SolutionScreen(
-        branches,
-        listOfNodes,
-        amountOfComponents,
-        listOfCycles,
-        SLEData(
-            Matrix(
-                Rows(
-                    listOf(Cols(listOf()))
-                )
-            ),
-            FreeFactors(listOf())
-        )
-    )
+//    SolutionScreen(
+//        branches,
+//        listOfNodes,
+//        amountOfComponents,
+//        listOfCycles,
+//        SLEData(
+//            Matrix(
+//                Rows(
+//                    listOf(Cols(listOf()))
+//                )
+//            ),
+//            FreeFactors(listOf())
+//        ),
+//        contCurrents
+//    )
+
+    Result(branches = branches, modifier = Modifier.fillMaxWidth())
 }
 
 
@@ -1035,6 +1157,7 @@ private fun SolutionScreenStepFivePreview() {
         modifier = Modifier
             .fillMaxWidth()
     )
+
 }
 
 
@@ -1058,5 +1181,15 @@ private fun SolutionScreenStepSixPreview() {
         ),
         modifier = Modifier
             .fillMaxWidth()
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SolutionScreenStepSevenPreview() {
+
+    StepSeven(
+        contourCurrents = mutableListOf(24.3, 324.4),
+        modifier = Modifier.fillMaxWidth()
     )
 }
