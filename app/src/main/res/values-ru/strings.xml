@@ -17,6 +17,7 @@
     <string name="ohm">Ом</string>
     <string name="emf">ЭДС</string>
     <string name="volt">В</string>
+    <string name="ampere">А</string>
     <string name="add_branch">Добавить ветвь</string>
     <string name="node_number">Номер узла</string>
     <string name="copy_all">Скопировать все</string>
@@ -26,6 +27,38 @@
     <string name="result">Результат</string>
     <string name="solution">Решение</string>
     <string name="invalid_input">Неправильный ввод Ветвь</string>
+    <string name="step_1">Шаг 1</string>
+    <string name="resistance">Сопротивление</string>
+    <string name="step_2">Шаг 2</string>
+    <string name="has_no_nodes">В цепи нет узлов</string>
+    <string name="number_of_nodes">Количество узлов</string>
+    <string name="node_numbers">Номера узлов</string>
+    <string name="step_3">Шаг 3</string>
+    <string name="has_no_components">В цепи нет компонент</string>
+    <string name="connected_components">Компонент связанности</string>
+    <string name="step_4">Шаг 4</string>
+    <string name="checks">Проверки</string>
+    <string name="circuit_is_closed">Цепь замкнута</string>
+    <string name="circuit_has_no_bridges">Цепь без мостов</string>
+    <string name="step_5">Шаг 5</string>
+    <string name="no_cycles_to_solve">Нет циклов для решения</string>
+    <string name="cycle">Цикл</string>
+    <string name="inverted">Инвертирована</string>
+    <string name="step_6">Шаг 6</string>
+    <string name="SLE">Система линейных уравнений</string>
+    <string name="step_7">Шаг 7</string>
+    <string name="loop_currents">Контурные токи</string>
+
+    <!-- Calculator errors -->
+    <string name="error">Ошибка</string>
+    <string name="errors">Ошибки</string>
+    <string name="error_not_enough_branches">Недостаточно ветвей. Требуется минимум 2 ветви для расчёта</string>
+    <string name="error_is_empty">пустая!</string>
+    <string name="error_has_empty_params">содержит пустые параметры!</string>
+    <string name="error_has_invalid_params">содержит некорректные параметры!</string>
+    <string name="error_circuit_is_not_closed">Цепь не замкнута! Проверьте входные и выходные узлы</string>
+    <string name="error_circuit_has_bridges">Цепь имеет мосты! Проверьте на непреднамеренные соединения или короткие замыкания</string>
+
 
     <!-- Settings -->
     <string name="app_theme">Тема приложения</string>
@@ -46,4 +79,6 @@
     <string name="consultation">Консультация</string>
     <string name="Denis">Денис</string>
     <string name="Alexander_Krylov">Александр Крылов</string>
+
+
 </resources>

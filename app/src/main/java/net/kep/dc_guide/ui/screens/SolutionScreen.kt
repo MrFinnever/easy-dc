@@ -127,7 +127,7 @@ private fun StepOne(
         modifier = modifier
     ) {
         Text(
-            text ="Step 1 - Collect Branches",
+            text = stringResource(id = R.string.step_1),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -285,7 +285,7 @@ private fun BranchSolutionInput(
         modifier = modifier
     ) {
         Text(
-            text = "Input: $inputNode",
+            text = stringResource(id = R.string.input) + ": $inputNode",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -305,7 +305,7 @@ private fun BranchSolutionOutput(
     ) {
 
         Text(
-            text = "Output: $outputNode",
+            text = stringResource(id = R.string.output) + ": $outputNode",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -325,7 +325,7 @@ private fun BranchSolutionEMF(
         modifier = modifier
     ) {
         Text(
-            text = "EMF: $emf V",
+            text = stringResource(id = R.string.emf) + ": $emf V",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -347,7 +347,7 @@ private fun BranchSolutionResistance(
         modifier = modifier
     ) {
         Text(
-            text = "Resistance: $resistance Ohm",
+            text = stringResource(id = R.string.resistance) + ": $resistance Ohm",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -368,7 +368,7 @@ private fun StepTwo(
         modifier = modifier
     ) {
         Text(
-            text ="Step 2",
+            text = stringResource(id = R.string.step_2),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -400,7 +400,7 @@ private fun ListOfNodes(
 
             if (list.size == 0) {
                 Text(
-                    text = "В цепи нет узлов",
+                    text = stringResource(id = R.string.has_no_nodes),
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(10.dp)
@@ -408,7 +408,7 @@ private fun ListOfNodes(
             }
             else {
                 Text(
-                    text = "Количество узлов: ${list.size}",
+                    text =  stringResource(id = R.string.number_of_nodes) + ": ${list.size}",
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 10.dp)
@@ -434,7 +434,7 @@ fun Nodes(
     ) {
         Column {
             Text(
-                text = "Номера узлов",
+                text = stringResource(id = R.string.node_numbers),
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
@@ -480,7 +480,7 @@ private fun StepThree(
         modifier = modifier
     ) {
         Text(
-            text ="Step 3",
+            text = stringResource(id = R.string.step_3),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -510,7 +510,7 @@ private fun AmountOfComponents(
 
             if (amount.intValue == 0) {
                 Text(
-                    text = "В цепи нет компонент",
+                    text = stringResource(id = R.string.has_no_components),
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(10.dp)
@@ -518,7 +518,8 @@ private fun AmountOfComponents(
             }
             else {
                 Text(
-                    text = "Компонент связанности: ${amount.intValue}",
+                    text = stringResource(id = R.string.connected_components)
+                            + ": ${amount.intValue}",
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 10.dp)
@@ -556,7 +557,7 @@ private fun StepFour(
         modifier = modifier
     ) {
         Text(
-        text ="Step 4",
+        text = stringResource(id = R.string.step_4),
         fontSize = 22.sp,
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -576,7 +577,7 @@ fun ChecksCard() {
             modifier = Modifier.padding(10.dp)
         ) {
             Text(
-                text = "Проверки",
+                text = stringResource(id = R.string.checks),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 10.dp)
@@ -604,7 +605,7 @@ private fun CircuitContinuous() {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Цепь замкнута",
+                text = stringResource(id = R.string.circuit_is_closed),
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -635,7 +636,7 @@ private fun HasNoBridges() {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Цепь без мостов",
+                text = stringResource(id = R.string.circuit_has_no_bridges),
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -660,7 +661,7 @@ private fun StepFive(
         modifier = modifier
     ) {
         Text(
-            text ="Step 5",
+            text = stringResource(id = R.string.step_5),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -689,7 +690,7 @@ private fun CycleCards(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Нет циклов для решения",
+                    text = stringResource(id = R.string.no_cycles_to_solve),
                     fontSize = 22.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(20.dp)
@@ -734,8 +735,8 @@ private fun CycleCard(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Цикл ${cycleIndex+1}",
-                fontSize = 18.sp,
+                text = stringResource(id = R.string.cycle) + " ${cycleIndex+1}",
+                fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -771,7 +772,7 @@ private fun CycleComponentCard(
     ) {
         Column {
             Text(
-                text = "Ветвь $branchID",
+                text = stringResource(id = R.string.branch) + " $branchID",
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
@@ -783,7 +784,7 @@ private fun CycleComponentCard(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Инвертирована:",
+                    text = stringResource(id = R.string.inverted) + ":",
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(start = 10.dp, top = 10.dp)
@@ -824,7 +825,7 @@ private fun StepSix(
         modifier = modifier
     ) {
         Text(
-            text ="Step 6",
+            text = stringResource(id = R.string.step_6),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -851,8 +852,8 @@ private fun SLECard(
             modifier = Modifier.padding(10.dp)
         ) {
             Text(
-                text = "Система линейных уравнений",
-                fontSize = 18.sp,
+                text = stringResource(id = R.string.SLE),
+                fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -939,9 +940,7 @@ private fun SLEText(
 
 @Composable
 private fun formatCoefficient(coefficient: Double, colIndex: Int, isFirst: Boolean): String {
-    var result = ""
-
-    result = when {
+    val result = when {
         colIndex == 0 -> {
             when {
                 coefficient < 0 -> "−${formatNumber(-coefficient)}"
@@ -986,7 +985,7 @@ private fun StepSeven(
         modifier = modifier
     ) {
         Text(
-            text ="Step 7",
+            text = stringResource(id = R.string.step_7),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -1017,7 +1016,7 @@ private fun ContourCurrentsCard(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Контурные токи",
+                text = stringResource(id = R.string.loop_currents),
                 fontSize = 22.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 10.dp)
@@ -1046,7 +1045,7 @@ private fun ContourCurrent(
         modifier = modifier
     ) {
         Text(
-            text = "I = ${formatDoubleToString(current)} A",
+            text = "I = ${formatDoubleToString(current)} " + stringResource(id = R.string.ampere),
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 10.dp)
@@ -1065,7 +1064,7 @@ fun Result(
     ) {
 
         Text(
-            text = "Result",
+            text = stringResource(id = R.string.result),
             fontSize = 22.sp,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -1086,10 +1085,10 @@ fun Result(
 @Composable
 private fun SolutionScreenPreview() {
     val branches = listOf(BranchResultUI())
-    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
-    val amountOfComponents = remember { mutableIntStateOf(3) }
-    val listOfCycles = listOf(CycleUI())
-    val contCurrents = mutableListOf(1.2, 23.4, 4.0)
+//    val listOfNodes = mutableListOf(1, 3, 4, 5, 8, 23)
+//    val amountOfComponents = remember { mutableIntStateOf(3) }
+//    val listOfCycles = listOf(CycleUI())
+//    val contCurrents = mutableListOf(1.2, 23.4, 4.0)
 
 //    SolutionScreen(
 //        branches,

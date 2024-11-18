@@ -1,5 +1,6 @@
 package net.kep.dc_guide.ui.screens
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -83,7 +84,6 @@ fun CalcScreen(
                 val error = errorsInBranch.getOrNull(index) ?: ErrorsInBranch()
 
                 BranchCard(
-                    index = index,
                     branchUI = branch,
                     isRemovable = index > 0,
                     onRemove = {
@@ -91,7 +91,6 @@ fun CalcScreen(
                             calculatorViewModel.removeBranch(index)
                         }
                     },
-                    calculatorViewModel = calculatorViewModel,
                     errorsInBranch = error,
                     modifier = if (index > 0) {
                         Modifier
@@ -222,12 +221,10 @@ fun AddBranchButton(
 
 @Composable
 fun BranchCard(
-    index: Int,
     branchUI: BranchUI,
     isRemovable: Boolean,
     onRemove: () -> Unit,
     errorsInBranch: ErrorsInBranch,
-    calculatorViewModel: CalculatorViewModel,
     modifier: Modifier
 ) {
     Card(
@@ -250,7 +247,6 @@ fun BranchCard(
                 input = branchUI.input,
                 output = branchUI.output,
                 errorsInBranch = errorsInBranch,
-                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -261,7 +257,6 @@ fun BranchCard(
                 placeholder = stringResource(id = R.string.volt),
                 textFields = branchUI.emf,
                 fieldErrors = errorsInBranch.isEMFError,
-                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -272,7 +267,6 @@ fun BranchCard(
                 placeholder = stringResource(id = R.string.ohm),
                 textFields = branchUI.resistors,
                 fieldErrors = errorsInBranch.isResistorsError,
-                calculatorViewModel = calculatorViewModel,
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .fillMaxWidth()
@@ -319,7 +313,6 @@ fun BranchCardLabel(
 fun BranchInputOutput(
     input: MutableState<String>,
     output: MutableState<String>,
-    calculatorViewModel: CalculatorViewModel,
     errorsInBranch: ErrorsInBranch,
     modifier: Modifier = Modifier
 ) {
@@ -394,7 +387,6 @@ fun BranchMultiComponent(
     placeholder: String,
     textFields: SnapshotStateList<String>,
     fieldErrors: SnapshotStateList<Boolean>,
-    calculatorViewModel: CalculatorViewModel,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -470,14 +462,19 @@ fun ErrorAlert(
 ) {
     AlertDialog(
         onDismissRequest = { calculatorViewModel.hideErrorAlert() },
-        title = { Text(text = "Ошибка") },
+        title = {
+            if (errorsInBranchList.size < 2)
+                Text(text = stringResource(id = R.string.error))
+            else
+                Text(text = stringResource(id = R.string.errors))
+                },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 Log.e("ErrorAlert", errorsInBranchList.toString())
 
-                errorsInBranchList.forEachIndexed { index, errors ->
+                errorsInBranchList.forEach { errors ->
                     Log.e("ErrorAlert", errors.messages.toString())
 
                     // Проверяем, есть ли сообщения в списке
@@ -488,8 +485,10 @@ fun ErrorAlert(
                         )
                     }
 
-                    if (errors.messages.contains("Цепь не замкнута."))
-                        return@forEachIndexed
+                    if (errors.messages.contains(
+                            stringResource(id = R.string.error_circuit_is_not_closed)
+                    ))
+                        return@forEach
                 }
             }
 
@@ -506,7 +505,8 @@ fun ErrorAlert(
 @Preview
 @Composable
 fun CalcScreenPreview() {
-    val calculatorViewModel = CalculatorViewModel()
+
+    val calculatorViewModel = CalculatorViewModel(application = Application())
     val calcNav = rememberNavController()
     CalcScreen(
         calculatorViewModel,

@@ -17,6 +17,7 @@
     <string name="ohm">Ohm</string>
     <string name="emf">EMF</string>
     <string name="volt">V</string>
+    <string name="ampere">A</string>
     <string name="add_branch">Add Branch</string>
     <string name="node_number">Node Number</string>
     <string name="copy_all">Copy All</string>
@@ -26,6 +27,37 @@
     <string name="result">Result</string>
     <string name="solution">Solution</string>
     <string name="invalid_input">Invalid input in Branch</string>
+    <string name="step_1">Step 1</string>
+    <string name="resistance">Resistance</string>
+    <string name="step_2">Step 2</string>
+    <string name="has_no_nodes">There are no nodes</string>
+    <string name="number_of_nodes">Number of nodes</string>
+    <string name="node_numbers">Node numbers</string>
+    <string name="step_3">Step 3</string>
+    <string name="has_no_components">There are no components</string>
+    <string name="connected_components">Connectivity components</string>
+    <string name="step_4">Step 4</string>
+    <string name="checks">Checks</string>
+    <string name="circuit_is_closed">Circuit is closed</string>
+    <string name="circuit_has_no_bridges">Circuit has no bridges</string>
+    <string name="step_5">Step 5</string>
+    <string name="no_cycles_to_solve">There are no cycles to solve</string>
+    <string name="cycle">Cycle</string>
+    <string name="inverted">Inverted</string>
+    <string name="step_6">Step 6</string>
+    <string name="SLE">System of linear equations</string>
+    <string name="step_7">Step 7</string>
+    <string name="loop_currents">Loop currents</string>
+
+    <!-- Calculator errors -->
+    <string name="error">Error</string>
+    <string name="errors">Errors</string>
+    <string name="error_not_enough_branches">Not enough branches for a closed circuit. A minimum of 2 branches is required</string>
+    <string name="error_is_empty">is empty!</string>
+    <string name="error_has_empty_params">has empty parameters!</string>
+    <string name="error_has_invalid_params">has invalid parameters!</string>
+    <string name="error_circuit_is_not_closed">Circuit is not closed! Check the input and output nodes</string>
+    <string name="error_circuit_has_bridges">Circuit has bridges! Check for unintended connections or shorts</string>
 
     <!-- Settings -->
     <string name="app_theme">App Theme</string>
@@ -33,7 +65,7 @@
     <string name="font_size">Font Size</string>
     <string name="background_music">Background Music</string>
 
-    <!-- Authors and credits -->
+    <!-- Authors and Credits -->
     <string name="project_team">Project Team</string>
     <string name="project_supervisor">Project Supervisor</string>
     <string name="Alexandra_Larionova">Alexandra Larionova</string>
@@ -46,7 +78,6 @@
     <string name="consultation">Consultation</string>
     <string name="Denis">Denis</string>
     <string name="Alexander_Krylov">Alexander Krylov</string>
-
 
 
 </resources>

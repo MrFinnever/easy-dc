@@ -1,5 +1,6 @@
 package net.kep.dc_guide.ui.screens
 
+import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -252,7 +253,8 @@ private fun DCValueCard(
     ) {
         if (dcValue < 0) dcValue.toString().replace("-", "－")
         Text(
-            text = "I = " + formatDoubleToString(dcValue) + " A",
+            text = "I = " + formatDoubleToString(dcValue)
+                    + " " + stringResource(id = R.string.ampere),
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.horizontalScroll(rememberScrollState())
@@ -319,7 +321,7 @@ fun formatDoubleToString(value: Double): String {
 @Preview
 @Composable
 private fun ResultScreenPreview() {
-    val calculatorViewModel = CalculatorViewModel()
+    val calculatorViewModel = CalculatorViewModel(application = Application())
     val calcNav = rememberNavController()
     ResultScreen(
         calculatorViewModel,

@@ -1,13 +1,16 @@
 package net.kep.dc_guide.ui.viewmodel
+import android.app.Application
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import net.kep.dc_guide.R
 import net.kep.dc_guide.data.calculator.BranchResultUI
 import net.kep.dc_guide.data.calculator.BranchUI
 import net.kep.dc_guide.data.calculator.ErrorsInBranch
@@ -31,7 +34,7 @@ import net.kep.dcc.exceptions.CircuitHasBridgesException
 import net.kep.dcc.exceptions.CircuitIsNotContinuousException
 
 
-class CalculatorViewModel: ViewModel() {
+class CalculatorViewModel(application: Application): AndroidViewModel(application) {
 
     private val _branches = MutableStateFlow(mutableListOf(BranchUI()))
     val branches: StateFlow<MutableList<BranchUI>> = _branches.asStateFlow()
@@ -68,6 +71,11 @@ class CalculatorViewModel: ViewModel() {
 
     private val _showErrorAlert = MutableStateFlow(false)
     val showErrorAlert: StateFlow<Boolean> = _showErrorAlert.asStateFlow()
+
+
+    fun getStringResource(@StringRes resId: Int): String {
+        return getApplication<Application>().getString(resId)
+    }
 
 
     //==================== Branches ====================//
@@ -109,14 +117,14 @@ class CalculatorViewModel: ViewModel() {
             oneBranch = true
 
             val error = ErrorsInBranch(id = 1)
-            error.messages.add("Недостаточно ветвей для замкнутой цепи. Нужно минимум 2 ветви.")
+            error.messages.add(getStringResource(R.string.error_not_enough_branches))
             errorsList.add(error)
 
             Log.d("Check 1", errorsList.toString())
         }
 
         if (!oneBranch) {
-            _branches.value.forEachIndexed { index, branch ->
+            _branches.value.forEachIndexed { index, _ ->
                 val branchErrors = ErrorsInBranch(id = index + 1)
 
                 var empty = false
@@ -125,18 +133,30 @@ class CalculatorViewModel: ViewModel() {
                 if (checkIfBranchIsEmpty(index)) {
                     hasErrors = true
                     empty = true
-                    branchErrors.messages.add("Ветвь ${index+1} пустая.")
+                    branchErrors.messages.add(
+                        getStringResource(R.string.branch)
+                            + " ${index+1} "
+                            + getStringResource(R.string.error_is_empty)
+                    )
                 }
 
                 if (!empty && checkIfParametersAreEmpty(index)) {
                     hasErrors = true
                     hasEmpty = true
-                    branchErrors.messages.add("Ветвь ${index+1} содержит пустые параметры.")
+                    branchErrors.messages.add(
+                        getStringResource(R.string.branch)
+                            + " ${index+1} "
+                            + getStringResource(R.string.error_has_empty_params)
+                    )
                 }
 
                 if (!empty && !hasEmpty && checkForInvalidValues(index)) {
                     hasErrors = true
-                    branchErrors.messages.add("Ветвь ${index+1} содержит некорректные данные.")
+                    branchErrors.messages.add(
+                        getStringResource(R.string.branch)
+                                + " ${index+1} "
+                                + getStringResource(R.string.error_has_invalid_params)
+                    )
                 }
 
                 errorsList.add(branchErrors)
@@ -147,7 +167,7 @@ class CalculatorViewModel: ViewModel() {
             val branchErrors = ErrorsInBranch()
             ecNotContinuous = true
             branchErrors.isCircuitNotContinuous = mutableStateOf(true)
-            branchErrors.messages.add("Цепь не замкнута!")
+            branchErrors.messages.add(getStringResource(R.string.error_circuit_is_not_closed))
 
             errorsList.add(branchErrors)
         }
@@ -156,7 +176,7 @@ class CalculatorViewModel: ViewModel() {
             val branchErrors = ErrorsInBranch()
 
             branchErrors.hasNoBridges = mutableStateOf(true)
-            branchErrors.messages.add("Цепь имеет мосты!")
+            branchErrors.messages.add(getStringResource(R.string.error_circuit_has_bridges))
 
             errorsList.add(branchErrors)
         }
