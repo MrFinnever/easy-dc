@@ -193,7 +193,9 @@ fun ResultCard(
             )
             DCValueCard(
                 dcValue = branch.current,
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier
+                    .padding(top = 10.dp, bottom = 20.dp)
+                    .padding(horizontal = 10.dp)
             )
         }
     }

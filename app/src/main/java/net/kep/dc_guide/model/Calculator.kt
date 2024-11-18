@@ -53,36 +53,46 @@ fun getCurrents(branchesUI: MutableList<BranchUI>): List<Double> {
 fun isCircuitContinuous(branchesUI: MutableList<BranchUI>): Boolean {
     val branches = collectBranches(branchesUI)
     Log.d("Calculator:isCircuitContinuous", branches.toString())
-
-    val ec = ElectricalCircuit(branches)
+    var ec: ElectricalCircuit? = null
     var res = false
 
+
     try {
-        res = ec.isCircuitContinuous
-        Log.d("Calculator:isCircuitContinuous", res.toString())
-    } catch (e: CircuitIsNotContinuousException) {
-        Log.e("Calculator:isCircuitContinuous", e.toString())
+        // Попытка создать объект ElectricalCircuit
+        ec = ElectricalCircuit(branches)
+    } catch (e: CircuitHasBridgesException) {
+        // Обработка ошибки о мостах и продолжение выполнения
+        Log.e("Calculator:isCircuitContinuous", "${e.message}")
+    }
+    if (ec != null) {
+        try {
+            res = ec.isCircuitContinuous
+            Log.w("Calculator:isCircuitContinuous", res.toString())
+        } catch (e: CircuitIsNotContinuousException) {
+            Log.e("Calculator:isCircuitContinuous", "${e.message}")
+        }
+    } else {
+        Log.e("Calculator:isCircuitContinuous", "Не удалось создать объект ElectricalCircuit")
     }
 
-    Log.d("Calculator:isCircuitContinuous", res.toString())
+    Log.w("Calculator:isCircuitContinuous", res.toString())
     return res
 }
 
 fun hasBridges(branchesUI: MutableList<BranchUI>): Boolean {
     val branches = collectBranches(branchesUI)
     Log.d("Calculator:hasBridges", branches.toString())
-
-    val ec = ElectricalCircuit(branches)
+    var ec: ElectricalCircuit? = null
     var res = false
 
     try {
-        res = !ec.hasNoBridges()
-        Log.d("Calculator:hasBridges", res.toString())
+        ec = ElectricalCircuit(branches)
     } catch (e: CircuitHasBridgesException) {
-        Log.e("Calculator:hasBridges", e.toString())
+        res = true
+        Log.e("Calculator:hasBridges", "${e.message}")
     }
 
-    Log.d("Calculator:hasBridges", res.toString())
+    Log.w("Calculator:hasBridges", res.toString())
     return res
 }
 

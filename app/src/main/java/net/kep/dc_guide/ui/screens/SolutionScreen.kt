@@ -868,6 +868,7 @@ private fun SLECard(
             SLEText(
                 sle = sle,
                 modifier = Modifier
+                    .padding(start = 10.dp, top = 10.dp)
                     .padding(10.dp)
                     .fillMaxWidth()
                     .horizontalScroll(rememberScrollState())
@@ -883,6 +884,7 @@ private fun SLEText(
 ) {
     val rowCount = sle.matrix.value.rows.size
     val dividerHeight = (rowCount * 32).dp
+
     Row(
         modifier = modifier
     ) {

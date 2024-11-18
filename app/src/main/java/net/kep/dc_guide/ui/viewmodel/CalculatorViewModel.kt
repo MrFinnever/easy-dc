@@ -73,7 +73,7 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
     val showErrorAlert: StateFlow<Boolean> = _showErrorAlert.asStateFlow()
 
 
-    fun getStringResource(@StringRes resId: Int): String {
+    private fun getStringResource(@StringRes resId: Int): String {
         return getApplication<Application>().getString(resId)
     }
 
@@ -104,7 +104,7 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
     //==================== Check Branches ====================//
 
 
-    fun validate() {
+    private fun validate() {
         resetErrors()
 
         val errorsList = mutableListOf<ErrorsInBranch>()
@@ -309,7 +309,8 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
         // Вход
         errorsInBranch.isInputError.value = branch.input.value.isEmpty() ||
                 !branch.input.value.isNumber() ||
-                !branch.input.value.isPositive()
+                branch.input.value.isNotIntAndPositive()
+
         if (errorsInBranch.isInputError.value) {
             hasInvalidValue = true
             Log.d(
@@ -322,7 +323,7 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
         // Выход
         errorsInBranch.isOutputError.value = branch.output.value.isEmpty() ||
                 !branch.output.value.isNumber() ||
-                !branch.output.value.isPositive()
+                branch.output.value.isNotIntAndPositive()
         if (errorsInBranch.isOutputError.value) {
             hasInvalidValue = true
             Log.d(
@@ -431,6 +432,16 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
     }
 
 
+    private fun String.isNotIntAndPositive(): Boolean {
+        return try {
+            toIntOrNull() == null || toIntOrNull()!! <= 0
+        } catch (e: Exception) {
+            Log.d("CalculatorVM:isNotIntAndPositive", "${e.message}")
+            true
+        }
+    }
+
+
     private fun resetErrors() {
         _errorsInBranches.value = mutableListOf()
     }
@@ -463,6 +474,7 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
                     errorsInBranch.isEMFError.any { it } ||
                     errorsInBranch.isResistorsError.any { it } ||
                     errorsInBranch.isCircuitNotContinuous.value ||
+                    errorsInBranch.hasNoBridges.value ||
                     errorsInBranch.messages.isNotEmpty()
         }
     }

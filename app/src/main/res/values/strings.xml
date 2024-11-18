@@ -57,7 +57,7 @@
     <string name="error_has_empty_params">has empty parameters!</string>
     <string name="error_has_invalid_params">has invalid parameters!</string>
     <string name="error_circuit_is_not_closed">Circuit is not closed! Check the input and output nodes</string>
-    <string name="error_circuit_has_bridges">Circuit has bridges! Check for unintended connections or shorts</string>
+    <string name="error_circuit_has_bridges">Circuit has bridges! Check for unintended connections</string>
 
     <!-- Settings -->
     <string name="app_theme">App Theme</string>

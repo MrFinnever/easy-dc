@@ -57,7 +57,7 @@
     <string name="error_has_empty_params">содержит пустые параметры!</string>
     <string name="error_has_invalid_params">содержит некорректные параметры!</string>
     <string name="error_circuit_is_not_closed">Цепь не замкнута! Проверьте входные и выходные узлы</string>
-    <string name="error_circuit_has_bridges">Цепь имеет мосты! Проверьте на непреднамеренные соединения или короткие замыкания</string>
+    <string name="error_circuit_has_bridges">Цепь имеет мосты! Проверьте на непреднамеренные соединения</string>
 
 
     <!-- Settings -->
