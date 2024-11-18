@@ -79,10 +79,12 @@ fun ResultScreen(
             ResultTopAppBar(calcNavCon = calcNavCon)
         },
         floatingActionButton = {
-            CopyAllFAB(
-                listBranchResult = branches,
-                selectedTab = selectedTab
-            )
+            if (selectedTab == Tabs.RESULT) {
+                CopyAllFAB(
+                    listBranchResult = branches,
+                    selectedTab = selectedTab
+                )
+            }
         }
     ) {
         Column(
@@ -270,8 +272,7 @@ private fun CopyAllFAB(
     ExtendedFloatingActionButton(
 
         onClick = {
-            when (selectedTab) {
-                Tabs.RESULT -> {
+            if (selectedTab == Tabs.RESULT) {
                     val allBranchCurrents = listBranchResult
                         .joinToString(separator = "\n") { branch ->
                             val current = branch.current.toString()
@@ -284,27 +285,6 @@ private fun CopyAllFAB(
                     }
                     clipboardManager.setText(AnnotatedString(allBranchCurrents))
                 }
-                Tabs.SOLUTION -> {
-                    val allBranchParams = listBranchResult
-                        .joinToString(separator = "\n") { branch ->
-                            val emf = branch.summarizedEMF.toString()
-
-                            if (branch.summarizedEMF < 0)
-                                emf.replace("-", "－")
-
-                            "====================\n" +
-                            "Branch ID = ${branch.id}\n" +
-                                    "Input Node = ${branch.inputNode}\n" +
-                                    "Output Node = ${branch.outputNode}\n" +
-                                    "Summarized EMF = ${branch.summarizedEMF}\n" +
-                                    "Summarized Resistance = ${branch.summarizedResistance}"
-                    }
-
-
-                    clipboardManager.setText(AnnotatedString(allBranchParams))
-                }
-            }
-
             Toast.makeText(context, context.getString(R.string.all_copied), Toast.LENGTH_SHORT).show()
         }
     ) {

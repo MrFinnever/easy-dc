@@ -74,7 +74,7 @@ fun SolutionScreen(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
-            .padding(bottom = 80.dp)
+            .padding(bottom = 20.dp)
     ) {
         StepOne(
             branches = branches,
@@ -1012,7 +1012,7 @@ private fun ContourCurrentsCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(top = 20.dp)
+                .padding(top = 10.dp)
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
         ) {
