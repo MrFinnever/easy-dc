@@ -67,7 +67,7 @@ fun ResultScreen(
     val amountOfComponents by calculatorViewModel.amountOfComponents.collectAsState()
     val listOfCycles by calculatorViewModel.allCycles.collectAsState()
     val sle by calculatorViewModel.sle.collectAsState()
-    val contourCurrents by calculatorViewModel.contourCurrents.collectAsState()
+    val loopCurrents by calculatorViewModel.loopCurrents.collectAsState()
 
     var selectedTab by remember { mutableStateOf(Tabs.RESULT) }
     val tabs = listOf(
@@ -115,7 +115,7 @@ fun ResultScreen(
                         amountOfComponents,
                         listOfCycles,
                         sle,
-                        contourCurrents
+                        loopCurrents
                     )
                 }
             }

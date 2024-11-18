@@ -65,7 +65,7 @@ fun SolutionScreen(
     components: MutableIntState,
     listOfCycles: List<CycleUI>,
     sle: SLEData,
-    contourCurrents: MutableList<Double>
+    loopCurrents: MutableList<Double>
 ) {
     Log.d("SolutionScreen:SolutionScreen", "branches: $branches")
 
@@ -106,7 +106,7 @@ fun SolutionScreen(
                 .fillMaxWidth()
         )
         StepSeven(
-            contourCurrents = contourCurrents,
+            loopCurrents = loopCurrents,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -270,7 +270,8 @@ private fun BranchSolutionParams(
                 summarizedResistance = summarizedResistance,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 20.dp))
+                    .padding(bottom = 10.dp)
+            )
         }
     }
 }
@@ -325,7 +326,9 @@ private fun BranchSolutionEMF(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(id = R.string.emf) + ": $emf V",
+            text = stringResource(id = R.string.emf)
+                    + ": $emf "
+                    + stringResource(id = R.string.volt),
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -347,7 +350,9 @@ private fun BranchSolutionResistance(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(id = R.string.resistance) + ": $resistance Ohm",
+            text = stringResource(id = R.string.resistance)
+                    + ": $resistance "
+                    + stringResource(id = R.string.ohm),
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
@@ -443,7 +448,8 @@ fun Nodes(
         LazyVerticalGrid(
             columns = GridCells.FixedSize(48.dp),
             modifier = Modifier
-                .padding(10.dp)
+                .padding(top = 10.dp)
+                .padding(horizontal = 10.dp)
                 .heightIn(max = 400.dp)
         ) {
             items(list.size) {
@@ -978,7 +984,7 @@ private fun formatNumber(number: Double): String {
 
 @Composable
 private fun StepSeven(
-    contourCurrents: MutableList<Double>,
+    loopCurrents: MutableList<Double>,
     modifier: Modifier
 ) {
     Column(
@@ -991,7 +997,7 @@ private fun StepSeven(
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
         ContourCurrentsCard(
-            contourCurrents = contourCurrents,
+            loopCurrents = loopCurrents,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
                 .fillMaxWidth()
@@ -1002,7 +1008,7 @@ private fun StepSeven(
 
 @Composable
 private fun ContourCurrentsCard(
-    contourCurrents: MutableList<Double>,
+    loopCurrents: MutableList<Double>,
     modifier: Modifier
 ) {
     Card(
@@ -1022,13 +1028,24 @@ private fun ContourCurrentsCard(
                 modifier = Modifier.padding(start = 10.dp)
             )
             
-            contourCurrents.forEach { current ->
-                ContourCurrent(
-                    current = current,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth()
-                )
+            loopCurrents.forEachIndexed { index, current ->
+                if (index == loopCurrents.size-1) {
+                    ContourCurrent(
+                        current = current,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxWidth()
+                    )
+                }
+                else {
+                    ContourCurrent(
+                        current = current,
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .padding(horizontal = 10.dp)
+                            .fillMaxWidth()
+                    )
+                }
             }
         }
     }
@@ -1048,7 +1065,7 @@ private fun ContourCurrent(
             text = "I = ${formatDoubleToString(current)} " + stringResource(id = R.string.ampere),
             fontSize = 22.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(10.dp)
         )
     }
 }
@@ -1188,7 +1205,7 @@ private fun SolutionScreenStepSixPreview() {
 private fun SolutionScreenStepSevenPreview() {
 
     StepSeven(
-        contourCurrents = mutableListOf(24.3, 324.4),
+        loopCurrents = mutableListOf(24.3, 324.4),
         modifier = Modifier.fillMaxWidth()
     )
 }

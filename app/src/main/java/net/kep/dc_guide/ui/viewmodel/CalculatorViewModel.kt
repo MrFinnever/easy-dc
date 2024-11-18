@@ -63,8 +63,8 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
     )
     val sle: StateFlow<SLEData> = _sle.asStateFlow()
 
-    private val _contourCurrents = MutableStateFlow(mutableListOf<Double>())
-    val contourCurrents: StateFlow<MutableList<Double>> = _contourCurrents.asStateFlow()
+    private val _loopCurrents = MutableStateFlow(mutableListOf<Double>())
+    val loopCurrents: StateFlow<MutableList<Double>> = _loopCurrents.asStateFlow()
 
     private val _errorsInBranches = MutableStateFlow(mutableListOf<ErrorsInBranch>())
     val errorsInBranches: StateFlow<List<ErrorsInBranch>> = _errorsInBranches.asStateFlow()
@@ -582,6 +582,6 @@ class CalculatorViewModel(application: Application): AndroidViewModel(applicatio
 
     private fun getContourCurrents() {
         val listOfContourCurrents: List<Double> = getContCurrents(_branches.value)
-        _contourCurrents.value = listOfContourCurrents.toMutableList()
+        _loopCurrents.value = listOfContourCurrents.toMutableList()
     }
 }
