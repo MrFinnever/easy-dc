@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DC-guide"
+rootProject.name = "Easy DC"
 include(":app")
 include(":dcc")

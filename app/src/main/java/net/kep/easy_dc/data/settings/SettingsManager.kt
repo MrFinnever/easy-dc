@@ -26,8 +26,8 @@ class SettingsManager(private val context: Context) {
     val getSettings: Flow<SettingsData> = context.dataStore.data
         .map { preferences ->
             SettingsData(
-                themeMode = preferences[THEME_MODE_KEY] ?: "system",
-                language = preferences[LANGUAGE_KEY] ?: "ru",
+                themeMode = preferences[THEME_MODE_KEY] ?: "System",
+                language = preferences[LANGUAGE_KEY] ?: "Russian",
                 fontSize = preferences[FONT_SIZE_KEY] ?: 3
             )
         }

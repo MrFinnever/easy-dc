@@ -1,5 +1,6 @@
 package net.kep.easy_dc.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +44,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -183,7 +183,16 @@ fun Language(
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
+    val russianLanguage = stringResource(id = R.string.language_russian)
+    val englishLanguage = stringResource(id = R.string.language_english)
+
     var selectedLanguage by remember { mutableStateOf(currentLanguage) }
+
+    val displayLanguage = when (selectedLanguage) {
+        "Russian" -> russianLanguage
+        "English" -> englishLanguage
+        else -> russianLanguage
+    }
 
     Card(
         shape = MaterialTheme.shapes.large,
@@ -221,7 +230,7 @@ fun Language(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Русский",
+                    text = displayLanguage,
                     color = MaterialTheme.colorScheme.surfaceTint,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
@@ -243,7 +252,7 @@ fun Language(
         ModalBottomSheet(
             onDismissRequest = {
                 coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
+                    sheetState.hide()
                     showModalBottomSheet = false
                 }
             },
@@ -258,12 +267,12 @@ fun Language(
                         selectedLanguage = "Russian"
                         onLanguageChanged("Russian")
                     },
-                    headlineContent = { Text("Русский") },
+                    headlineContent = { Text(russianLanguage) },
                     trailingContent = {
                         RadioButton(
                             selected = selectedLanguage == "Russian",
                             onClick = {
-                                selectedLanguage = ""
+                                selectedLanguage = "Russian"
                                 onLanguageChanged("Russian")
                             }
                         )
@@ -305,10 +314,17 @@ fun ThemeSelectionScreen(
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
+    val lightThemeMode = stringResource(id = R.string.light_theme_mode)
+    val darkThemeMode = stringResource(id = R.string.dark_theme_mode)
+    val systemThemeMode = stringResource(id = R.string.system_theme_mode)
+
     var selectedTheme by remember { mutableStateOf(currentTheme) }
 
-    LaunchedEffect(currentTheme) {
-        selectedTheme = currentTheme
+    val displayThemeMode = when (selectedTheme) {
+        "Light" -> lightThemeMode
+        "Dark" -> darkThemeMode
+        "System" -> systemThemeMode
+        else -> systemThemeMode
     }
 
     Card(
@@ -346,7 +362,7 @@ fun ThemeSelectionScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Системная",
+                    text = displayThemeMode,
                     color = MaterialTheme.colorScheme.surfaceTint,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
@@ -366,7 +382,7 @@ fun ThemeSelectionScreen(
         ModalBottomSheet(
             onDismissRequest = {
                 coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
+                    sheetState.hide()
                     showModalBottomSheet = false
                 }
             },
@@ -993,12 +1009,14 @@ fun FontSize(
     currentFontSize: Int,
     onFontSizeChanged: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
     var fontSize by remember { mutableFloatStateOf(currentFontSize.toFloat()) }
-    var fontSizeName by remember { mutableStateOf(getFontSizeName(fontSize)) }
+    var fontSizeName by remember { mutableStateOf(getFontSizeName(fontSize, context)) }
 
 
 
@@ -1037,7 +1055,7 @@ fun FontSize(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Средний",
+                    text = fontSizeName,
                     color = MaterialTheme.colorScheme.surfaceTint,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
@@ -1059,7 +1077,7 @@ fun FontSize(
         ModalBottomSheet(
             onDismissRequest = {
                 coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
+                    sheetState.hide()
                     showModalBottomSheet = false
                 }
             },
@@ -1090,7 +1108,7 @@ fun FontSize(
                     valueRange = 1f..5f,
                     onValueChange = {
                         fontSize = it
-                        fontSizeName = getFontSizeName(it)
+                        fontSizeName = getFontSizeName(it, context)
                     },
                     onValueChangeFinished = {
                         onFontSizeChanged(fontSize.toInt())
@@ -1107,16 +1125,17 @@ fun FontSize(
 }
 
 
-private fun getFontSizeName(fontSize: Float): String {
+private fun getFontSizeName(fontSize: Float, context: Context): String {
     return when (fontSize) {
-        1f -> "Очень мелкий"
-        2f -> "Мелкий"
-        3f -> "Средний"
-        4f -> "Крупный"
-        5f -> "Очень крупный"
-        else -> "Средний"
+        1f -> context.getString(R.string.font_size_very_small)
+        2f -> context.getString(R.string.font_size_small)
+        3f -> context.getString(R.string.font_size_medium)
+        4f -> context.getString(R.string.font_size_large)
+        5f -> context.getString(R.string.font_size_very_large)
+        else -> context.getString(R.string.font_size_medium)
     }
 }
+
 
 
 @Preview(showBackground = true)
