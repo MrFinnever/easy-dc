@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "net.kep.dc_guide"
+    namespace = "net.kep.easy_dc"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "net.kep.dc_guide"
+        applicationId = "net.kep.easy_dc"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -82,7 +82,7 @@ dependencies {
     //Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     //Zoomable
-    implementation("net.engawapg.lib:zoomable:1.6.2")
+    //implementation("net.engawapg.lib:zoomable:1.6.2")
     implementation("io.github.grizzi91:bouquet:1.1.2")
     implementation("org.ejml:ejml-simple:0.43.1")
     implementation(project(":dcc"))
