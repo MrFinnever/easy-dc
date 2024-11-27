@@ -1,6 +1,7 @@
 package net.kep.easy_dc.data.settings
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -15,8 +16,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("s
 
 class SettingsManager(private val context: Context) {
     companion object SettingsKeys {
-        val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         val LANGUAGE_KEY = stringPreferencesKey("language")
+        val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         val FONT_SIZE_KEY = intPreferencesKey("font_size")
     }
 
@@ -26,8 +27,8 @@ class SettingsManager(private val context: Context) {
     val getSettings: Flow<SettingsData> = context.dataStore.data
         .map { preferences ->
             SettingsData(
+                language = preferences[LANGUAGE_KEY] ?: "en",
                 themeMode = preferences[THEME_MODE_KEY] ?: "System",
-                language = preferences[LANGUAGE_KEY] ?: "Russian",
                 fontSize = preferences[FONT_SIZE_KEY] ?: 3
             )
         }
@@ -36,9 +37,10 @@ class SettingsManager(private val context: Context) {
     //==================== Set All Settings ====================//
 
     suspend fun saveSettings(settings: SettingsData) {
+        Log.d("SettingsManager", "Saving language: ${settings.language}")
         context.dataStore.edit { preferences ->
+            preferences[LANGUAGE_KEY] = settings.language.toString()
             preferences[THEME_MODE_KEY] = settings.themeMode
-            preferences[LANGUAGE_KEY] = settings.language
             preferences[FONT_SIZE_KEY] = settings.fontSize
         }
     }

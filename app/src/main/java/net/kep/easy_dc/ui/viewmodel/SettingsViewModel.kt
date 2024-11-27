@@ -1,64 +1,54 @@
 package net.kep.easy_dc.ui.viewmodel
 
-//class SettingsViewModel(private val settingsManager: SettingsManager) : ViewModel() {
-//
-//    // Получаем настройки как StateFlow для использования в UI
-//    val themeMode: StateFlow<String> = settingsManager.themeModeFlow
-//        .stateIn(viewModelScope, SharingStarted.Lazily, "system")
-//
-//    val language: StateFlow<String> = settingsManager.languageFlow
-//        .stateIn(viewModelScope, SharingStarted.Lazily, "ru")
-//
-//    val fontSize: StateFlow<Int> = settingsManager.fontSizeFlow
-//        .stateIn(viewModelScope, SharingStarted.Lazily, 3)
-//
-//
-//    // Методы для изменения настроек
-//    fun setThemeMode(themeMode: String) {
-//        viewModelScope.launch {
-//            settingsManager.saveThemeMode(themeMode)
-//        }
-//    }
-//
-//    fun setLanguage(language: String) {
-//        viewModelScope.launch {
-//            settingsManager.saveLanguage(language)
-//        }
-//    }
-//
-//    fun setFontSize(fontSize: Int) {
-//        viewModelScope.launch {
-//            settingsManager.saveFontSize(fontSize)
-//        }
-//    }
-//}
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import net.kep.easy_dc.data.settings.SettingsData
+import net.kep.easy_dc.data.settings.SettingsManager
 
+class SettingsViewModel(private val settingsManager: SettingsManager) : ViewModel() {
 
+    private val _language = MutableStateFlow("null")
+    val language: StateFlow<String> = _language.asStateFlow()
 
-//private val dataStore = context.dataStore
-//
-//    val fontSizeFlow: Flow<Int> = dataStore.data
-//        .map { preferences ->
-//            preferences[SettingsKeys.FONT_SIZE] ?: 16 // значение по умолчанию
-//        }
-//
-//
-//    val themeModeFlow: Flow<ThemeMode> = dataStore.data
-//        .map { preferences ->
-//            when (preferences[SettingsKeys.THEME_MODE]) {
-//                "DARK" -> ThemeMode.DARK
-//                "LIGHT" -> ThemeMode.LIGHT
-//                else -> ThemeMode.SYSTEM
-//            }
-//        }
-//
-//    suspend fun setThemeMode(context: Context, themeMode: ThemeMode) {
-//        context.dataStore.edit { preferences ->
-//            preferences[SettingsKeys.THEME_MODE] = themeMode.mode
-//        }
-//    }
-//    suspend fun setFontSize(context: Context, fontSize: Int) {
-//        context.dataStore.edit { preferences ->
-//            preferences[SettingsKeys.FONT_SIZE] = fontSize
-//        }
-//    }
+    private val _themeMode = MutableStateFlow("System")
+    val themeMode: StateFlow<String> = _themeMode.asStateFlow()
+
+    private val _fontSize = MutableStateFlow(3)
+    val fontSize: StateFlow<Int> = _fontSize.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            settingsManager.getSettings.collect { settings ->
+                if (_language.value == "null")
+                    _language.value = settings.language
+            }
+        }
+        Log.d("VM", "Language: ${_language.value}")
+    }
+
+    fun setSettings(newLanguage: String) {
+        viewModelScope.launch {
+            settingsManager.saveSettings(
+                SettingsData(
+                    newLanguage
+                )
+            )
+            _language.value = newLanguage
+        }
+    }
+
+    fun getSettings() {
+        viewModelScope.launch {
+            settingsManager.getSettings.collect { settings ->
+                _language.value = settings.language
+                _themeMode.value = settings.themeMode
+                _fontSize.value = settings.fontSize
+            }
+        }
+    }
+}

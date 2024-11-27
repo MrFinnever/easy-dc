@@ -9,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.kep.easy_dc.data.settings.SettingsData
 import net.kep.easy_dc.data.settings.SettingsManager
 import net.kep.easy_dc.ui.navigation.CalcNavHost
 import net.kep.easy_dc.ui.navigation.NavBar
@@ -17,7 +16,6 @@ import net.kep.easy_dc.ui.navigation.NavRoutes
 
 @Composable
 fun MainScreen(
-    settingsData: SettingsData,
     settingsManager: SettingsManager
 ) {
     val mainNavCon = rememberNavController()
@@ -34,9 +32,9 @@ fun MainScreen(
             composable(NavRoutes.Calculator.route) {
                 CalcNavHost(mainNavCon)
             }
-            composable(NavRoutes.Settings.route) { SettingsScreen(
-                settingsData = settingsData, settingsManager = settingsManager
-            ) }
+            composable(NavRoutes.Settings.route) {
+                SettingsScreen(settingsManager = settingsManager)
+            }
         }
     }
 }
@@ -47,7 +45,6 @@ fun MainScreen(
 fun MainScreenPreview() {
     val context = LocalContext.current
     MainScreen(
-        settingsData = SettingsData(),
         settingsManager = SettingsManager(context.applicationContext)
     )
 }

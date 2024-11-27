@@ -1,6 +1,10 @@
 package net.kep.easy_dc.ui.screens
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
+import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +48,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,49 +65,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.launch
 import net.kep.easy_dc.R
-import net.kep.easy_dc.data.settings.SettingsData
 import net.kep.easy_dc.data.settings.SettingsManager
+import net.kep.easy_dc.ui.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
-    settingsData: SettingsData,
+    //settingsData: SettingsData,
     settingsManager: SettingsManager
 ) {
+    val settingsViewModel = SettingsViewModel(settingsManager)
+    val language by settingsViewModel.language.collectAsState()
+    val themeMode = settingsViewModel.themeMode.collectAsState()
+    val fontSize = settingsViewModel.fontSize.collectAsState()
+
+    settingsManager.getSettings
+
     val coroutineScope = rememberCoroutineScope()
-
-
-    val updateLanguage: (String) -> Unit = { newLanguage ->
-        coroutineScope.launch {
-            settingsManager.saveSettings(
-                settingsData.copy(language = newLanguage)
-            )
-        }
-    }
-
-    val updateTheme: (String) -> Unit = { newTheme ->
-        coroutineScope.launch {
-            settingsManager.saveSettings(
-                settingsData.copy(themeMode = newTheme)
-            )
-        }
-    }
-
-    val updateFontSize: (Int) -> Unit = { newFontSize ->
-        coroutineScope.launch {
-            settingsManager.saveSettings(
-                settingsData.copy(fontSize = newFontSize)
-            )
-        }
-    }
-
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            //.padding(it)
-            .padding(top = 30.dp)
             .verticalScroll(rememberScrollState())
     ) {
         AppPresentation()
@@ -110,17 +95,17 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.padding(5.dp))
 
         Language(
-            currentLanguage = settingsData.language,
-            onLanguageChanged = updateLanguage
+            language = language,
+            settingsViewModel = settingsViewModel
         )
-        ThemeSelectionScreen(
-            currentTheme = settingsData.themeMode,
-            onThemeChanged = updateTheme
-        )
-        FontSize(
-            currentFontSize = settingsData.fontSize,
-            onFontSizeChanged = updateFontSize
-        )
+//        ThemeSelectionScreen(
+//            currentTheme = themeMode.value,
+//            onThemeChanged = updateTheme
+//        )
+//        FontSize(
+//            currentFontSize = fontSize.value,
+//            onFontSizeChanged = updateFontSize
+//        )
 
         Spacer(modifier = Modifier.padding(5.dp))
 
@@ -142,7 +127,7 @@ fun AppPresentation() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .padding(top = 10.dp)
+            .padding(top = 40.dp)
             .fillMaxWidth()
     ) {
         Box(
@@ -176,23 +161,23 @@ fun AppPresentation() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Language(
-    currentLanguage: String,
-    onLanguageChanged: (String) -> Unit
+    language: String,
+    settingsViewModel: SettingsViewModel
 ) {
-    var showModalBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val russianLanguage = stringResource(id = R.string.language_russian)
     val englishLanguage = stringResource(id = R.string.language_english)
 
-    var selectedLanguage by remember { mutableStateOf(currentLanguage) }
 
-    val displayLanguage = when (selectedLanguage) {
-        "Russian" -> russianLanguage
-        "English" -> englishLanguage
-        else -> russianLanguage
-    }
+    Log.d("SettingsScreen:Language", "language: $language")
+
+
+
+    var showModalBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
+    val coroutineScope = rememberCoroutineScope()
 
     Card(
         shape = MaterialTheme.shapes.large,
@@ -219,7 +204,7 @@ fun Language(
                     tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Язык",
+                    text = stringResource(id = R.string.language),
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
@@ -230,7 +215,7 @@ fun Language(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = displayLanguage,
+                    text = if (language == "ru") russianLanguage else englishLanguage,
                     color = MaterialTheme.colorScheme.surfaceTint,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
@@ -246,8 +231,6 @@ fun Language(
         }
     }
 
-
-    // Модальный лист для выбора темы
     if (showModalBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -264,16 +247,18 @@ fun Language(
             ) {
                 ListItem(
                     modifier = Modifier.clickable {
-                        selectedLanguage = "Russian"
-                        onLanguageChanged("Russian")
+                        settingsViewModel.getSettings()
+                        settingsViewModel.setSettings("ru")
+                        updateLanguage(context, "ru")
                     },
                     headlineContent = { Text(russianLanguage) },
                     trailingContent = {
                         RadioButton(
-                            selected = selectedLanguage == "Russian",
+                            selected = language == "ru",
                             onClick = {
-                                selectedLanguage = "Russian"
-                                onLanguageChanged("Russian")
+                                settingsViewModel.getSettings()
+                                settingsViewModel.setSettings("ru")
+                                updateLanguage(context, "ru")
                             }
                         )
                     }
@@ -282,16 +267,18 @@ fun Language(
 
                 ListItem(
                     modifier = Modifier.clickable {
-                        selectedLanguage = "English"
-                        onLanguageChanged("English")
+                        settingsViewModel.getSettings()
+                        settingsViewModel.setSettings("en")
+                        updateLanguage(context, "en")
                     },
-                    headlineContent = { Text("English") },
+                    headlineContent = { Text(stringResource(id = R.string.language_english)) },
                     trailingContent = {
                         RadioButton(
-                            selected = selectedLanguage == "English",
+                            selected = language != "ru",
                             onClick = {
-                                selectedLanguage = "English"
-                                onLanguageChanged("English")
+                                settingsViewModel.getSettings()
+                                settingsViewModel.setSettings("en")
+                                updateLanguage(context, "en")
                             }
                         )
                     }
@@ -301,6 +288,34 @@ fun Language(
             }
         }
     }
+}
+
+
+fun updateLanguage(
+    context: Context,
+    newLanguage: String
+) {
+    restartActivity(context, newLanguage)
+}
+
+private fun restartActivity(
+    context: Context,
+    newLanguage: String
+) {
+    context.findActivity()?.runOnUiThread {
+        val appLocale = when (newLanguage) {
+            "ru" -> LocaleListCompat.forLanguageTags("ru")
+            "en" -> LocaleListCompat.forLanguageTags("en")
+            else -> LocaleListCompat.forLanguageTags("en")
+        }
+        AppCompatDelegate.setApplicationLocales(appLocale)
+    }
+}
+
+private fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 
@@ -1143,7 +1158,7 @@ private fun getFontSizeName(fontSize: Float, context: Context): String {
 fun SettingsScreenPreview() {
     val context = LocalContext.current
     SettingsScreen(
-        settingsData = SettingsData(),
+        //settingsData = SettingsData(),
         settingsManager = SettingsManager(context)
     )
 }

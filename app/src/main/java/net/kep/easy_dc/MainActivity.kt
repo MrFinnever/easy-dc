@@ -1,42 +1,52 @@
 package net.kep.easy_dc
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import net.kep.easy_dc.data.settings.SettingsData
 import net.kep.easy_dc.data.settings.SettingsManager
 import net.kep.easy_dc.ui.screens.MainScreen
 import net.kep.easy_dc.ui.theme.EasyDCTheme
+import net.kep.easy_dc.ui.viewmodel.SettingsViewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val settingsManager = SettingsManager(this)
+        val settingsManager = SettingsManager(this.applicationContext)
 
         setContent {
             EasyDCTheme {
-                val settingsState = remember { mutableStateOf(SettingsData()) }
+                val currentLocale = this@MainActivity.applicationContext.resources
+                                                            .configuration.locales[0]
 
-                LaunchedEffect(key1 = true) {
-                    settingsManager.getSettings.collect { settings ->
-                        settingsState.value = settings
-                    }
-                }
+                val settingsViewModel = SettingsViewModel(settingsManager)
+                val language by settingsViewModel.language.collectAsState()
+
+                if (language == "null")
+                    settingsViewModel.setSettings(currentLocale.language)
+
+
+
+
+
+                Log.d("MainActivity", "language: ${settingsViewModel.language}")
+                Log.d("MainActivity", "themeMode: ${settingsViewModel.themeMode}")
+                Log.d("MainActivity", "fontSize: ${settingsViewModel.fontSize}")
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MainScreen(
-                        settingsData = settingsState.value,
                         settingsManager = settingsManager
                     )
                 }
