@@ -3,6 +3,8 @@ package net.kep.easy_dc.ui.screens
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
@@ -23,8 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Diversity1
+import androidx.compose.material.icons.filled.Diversity3
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.Handshake
@@ -58,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,6 +76,7 @@ import kotlinx.coroutines.launch
 import net.kep.easy_dc.R
 import net.kep.easy_dc.data.settings.SettingsManager
 import net.kep.easy_dc.ui.viewmodel.SettingsViewModel
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -123,7 +130,7 @@ fun SettingsScreen(
 
 
 @Composable
-fun AppPresentation() {
+private fun AppPresentation() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -160,7 +167,7 @@ fun AppPresentation() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Language(
+private fun Language(
     language: String,
     settingsViewModel: SettingsViewModel
 ) {
@@ -180,7 +187,6 @@ fun Language(
     val coroutineScope = rememberCoroutineScope()
 
     Card(
-        shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
@@ -291,7 +297,7 @@ fun Language(
 }
 
 
-fun updateLanguage(
+private fun updateLanguage(
     context: Context,
     newLanguage: String
 ) {
@@ -321,7 +327,7 @@ private fun Context.findActivity(): Activity? = when (this) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThemeSelectionScreen(
+private fun ThemeSelectionScreen(
     currentTheme: String,
     onThemeChanged: (String) -> Unit
 ) {
@@ -469,7 +475,7 @@ fun ThemeSelectionScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Authors() {
+private fun Authors() {
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -655,7 +661,7 @@ fun Authors() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Credits() {
+private fun Credits() {
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -793,7 +799,7 @@ fun Credits() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutApp() {
+private fun AboutApp() {
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -823,7 +829,7 @@ fun AboutApp() {
                     tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "О проекте",
+                    text = stringResource(id = R.string.about_project),
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
@@ -842,7 +848,7 @@ fun AboutApp() {
         ModalBottomSheet(
             onDismissRequest = {
                 coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
+                    sheetState.hide()
                     showModalBottomSheet = false
                 }
             },
@@ -850,11 +856,11 @@ fun AboutApp() {
         ) {
             Column(
                 modifier = Modifier
+                    .padding(horizontal = 20.dp)
                     .fillMaxWidth()
             ) {
-
                 Text(
-                    text = "*Куча текста про то, как важен этот проект. Может быть даже отдельным окном будет*",
+                    text = localizedText(),
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
@@ -866,10 +872,25 @@ fun AboutApp() {
     }
 }
 
+
+@Composable
+private fun localizedText(): String {
+    val fileName = when (Locale.getDefault().language) {
+        "ru" -> "about_project_ru.txt"
+        "en" -> "about_project_en.txt"
+        else -> "about_project_en.txt"
+    }
+
+    val context = LocalContext.current
+    val inputStream = context.assets.open(fileName)
+    return inputStream.bufferedReader().use { it.readText() }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OpenSource() {
-    var showModalBottomSheet by remember { mutableStateOf(false) }
+private fun OpenSource() {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -880,7 +901,13 @@ fun OpenSource() {
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.medium)
-            .clickable { showModalBottomSheet = true }
+            .clickable {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://github.com/MrFinnever/easy-dc")
+                )
+                context.startActivity(intent)
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -898,7 +925,7 @@ fun OpenSource() {
                     tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Исходный код",
+                    text = stringResource(id = R.string.open_source),
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
@@ -912,39 +939,12 @@ fun OpenSource() {
             )
         }
     }
-
-    if (showModalBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
-                    showModalBottomSheet = false
-                }
-            },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-
-                Text(
-                    text = "*Куча текста про то, как важен этот проект. Может быть даже отдельным окном будет*",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-
-                Spacer(modifier = Modifier.padding(vertical = 50.dp))
-            }
-        }
-    }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun License() {
+private fun License() {
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -974,7 +974,7 @@ fun License() {
                     tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Лицензия",
+                    text = stringResource(id = R.string.license),
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
@@ -993,25 +993,92 @@ fun License() {
         ModalBottomSheet(
             onDismissRequest = {
                 coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
+                    sheetState.hide()
                     showModalBottomSheet = false
                 }
             },
             sheetState = sheetState
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
+            LicenseDescription()
+        }
+    }
+}
 
+
+@Composable
+fun LicenseDescription() {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(id = R.string.app_under_license),
+            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+            fontStyle = MaterialTheme.typography.titleMedium.fontStyle
+        )
+        Text(
+            text = stringResource(id = R.string.license_rights),
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+            fontWeight = FontWeight.W500,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 10.dp)
+        )
+
+
+        RightCard(
+            right = stringResource(id = R.string.license_right_use),
+            icon = Icons.Default.AutoAwesome
+        )
+        RightCard(
+            right = stringResource(id = R.string.license_right_modify),
+            icon = Icons.Default.AutoFixHigh
+        )
+        RightCard(
+            right = stringResource(id = R.string.license_right_share),
+            icon = Icons.Default.Diversity3
+        )
+
+
+
+        Spacer(modifier = Modifier.padding(vertical = 50.dp))
+    }
+}
+
+@Composable
+fun RightCard(
+    right: String,
+    icon: ImageVector
+) {
+    Card(
+        shape = MaterialTheme.shapes.large,
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .fillMaxWidth()
+
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = right,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
                 Text(
-                    text = "*Куча текста про то, как важен этот проект. Может быть даже отдельным окном будет*",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    text = right,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
-
-                Spacer(modifier = Modifier.padding(vertical = 50.dp))
             }
         }
     }
@@ -1020,7 +1087,7 @@ fun License() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FontSize(
+private fun FontSize(
     currentFontSize: Int,
     onFontSizeChanged: (Int) -> Unit
 ) {
@@ -1032,8 +1099,6 @@ fun FontSize(
 
     var fontSize by remember { mutableFloatStateOf(currentFontSize.toFloat()) }
     var fontSizeName by remember { mutableStateOf(getFontSizeName(fontSize, context)) }
-
-
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -1086,8 +1151,6 @@ fun FontSize(
         }
     }
 
-
-    // Модальный лист для выбора темы
     if (showModalBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -1153,12 +1216,23 @@ private fun getFontSizeName(fontSize: Float, context: Context): String {
 
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en")
 @Composable
 fun SettingsScreenPreview() {
     val context = LocalContext.current
-    SettingsScreen(
-        //settingsData = SettingsData(),
-        settingsManager = SettingsManager(context)
-    )
+    LicenseDescription()
+//    SettingsScreen(
+//        //settingsData = SettingsData(),
+//        settingsManager = SettingsManager(context)
+//    )
+}
+@Preview(showBackground = true, locale = "ru")
+@Composable
+fun SettingsScreenPreviewRu() {
+    val context = LocalContext.current
+    LicenseDescription()
+//    SettingsScreen(
+//        //settingsData = SettingsData(),
+//        settingsManager = SettingsManager(context)
+//    )
 }

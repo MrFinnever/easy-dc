@@ -13,7 +13,7 @@ import net.kep.easy_dc.R
 @Composable
 fun GuideScreen() {
     val pdfState = rememberVerticalPdfReaderState(
-        resource = ResourceType.Asset(R.raw.theory),
+        resource = ResourceType.Asset(R.raw.theory_ru),
         isZoomEnable = true
     )
     VerticalPDFReader(

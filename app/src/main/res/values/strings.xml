@@ -60,20 +60,37 @@
     <string name="error_circuit_has_bridges">Circuit has bridges! Check for unintended connections</string>
 
     <!-- Settings -->
-    <string name="app_theme">App Theme</string>
     <string name="language">Language</string>
-    <string name="font_size">Font Size</string>
-    <string name="background_music">Background Music</string>
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
+
+    <string name="app_theme">App Theme</string>
     <string name="light_theme_mode">Light</string>
     <string name="dark_theme_mode">Dark</string>
     <string name="system_theme_mode">System</string>
+
+    <string name="font_size">Font Size</string>
     <string name="font_size_very_small">Very small</string>
     <string name="font_size_small">Small</string>
     <string name="font_size_medium">Medium</string>
     <string name="font_size_large">Large</string>
     <string name="font_size_very_large">Very large</string>
+
+    <string name="about_project">About Project</string>
+    <string name="open_source">Open Source</string>
+
+    <string name="license">License</string>
+    <string name="app_under_license">The app is distributed under the GNU General Public License v3.0 (GPLv3)</string>
+    <string name="license_rights">You can</string>
+    <string name="license_right_use">Use</string>
+    <string name="license_right_use_description">For any purpose</string>
+    <string name="license_right_modify">Modify</string>
+    <string name="license_right_modify_description">As you wish</string>
+    <string name="license_right_share">Distribute</string>
+    <string name="license_right_share_description">App and modifications</string>
+    <string name="license_ban_close">Close the Source Code</string>
+    <string name="license_more">More info</string>
+
 
     <!-- Authors and Credits -->
     <string name="project_team">Project Team</string>

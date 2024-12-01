@@ -61,20 +61,36 @@
 
 
     <!-- Settings -->
-    <string name="app_theme">Тема приложения</string>
     <string name="language">Язык</string>
-    <string name="font_size">Размер шрифта</string>
-    <string name="background_music">Фоновая музыка</string>
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
+
+    <string name="app_theme">Тема приложения</string>
     <string name="light_theme_mode">Светлая</string>
     <string name="dark_theme_mode">Тёмная</string>
     <string name="system_theme_mode">Системная</string>
+
+    <string name="font_size">Размер шрифта</string>
     <string name="font_size_very_small">Очень мелкий</string>
     <string name="font_size_small">Мелкий</string>
     <string name="font_size_medium">Средний</string>
     <string name="font_size_large">Крупный</string>
     <string name="font_size_very_large">Очень крупный</string>
+
+    <string name="about_project">О проекте</string>
+    <string name="open_source">Исходный код</string>
+
+    <string name="license">Лицензия</string>
+    <string name="app_under_license">Приложение распространяется под свободной лицензией GNU General Public License v3.0 (GPLv3)</string>
+    <string name="license_rights">Вы можете</string>
+    <string name="license_right_use">Использовать</string>
+    <string name="license_right_use_description">Для любых целей</string>
+    <string name="license_right_modify">Модифицировать</string>
+    <string name="license_right_modify_description">Как пожелаете</string>
+    <string name="license_right_share">Распространять</string>
+    <string name="license_right_share_description">Приложение и модификации</string>
+    <string name="license_ban_close">Закрывать Исходный код</string>
+    <string name="license_more">Подробнее</string>
 
     <!-- Authors and credits -->
     <string name="project_team">Команда проекта</string>
