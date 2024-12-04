@@ -2,13 +2,15 @@
 <resources>
     <!-- General -->
     <string name="app_name">Easy DC</string>
+    <string name="version">Версия:</string>
+    <string name="version_number">1.0.0</string>
     <string name="guide">Теория</string>
     <string name="calculator">Калькулятор</string>
     <string name="settings">Настройки</string>
 
     <!-- Calculator -->
     <string name="calculation">Расчёт</string>
-    <string name="calculate_circuit">Рассчёт цепи</string>
+    <string name="calculate_circuit">Расчёт цепи</string>
     <string name="calculate">Рассчитать</string>
     <string name="branch">Ветвь</string>
     <string name="input">Вход</string>
@@ -100,10 +102,10 @@
     <string name="Ivan_Lebedev">Иван Лебедев</string>
     <string name="application">Приложение</string>
     <string name="Leonid_Krupenkov">Леонид Крупеньков</string>
-    <string name="Dmitry">Дмитрий</string>
+    <string name="Dmitry">Дмитрий Служанин</string>
     <string name="credits">Благодарности</string>
     <string name="consultation">Консультация</string>
-    <string name="Denis">Денис</string>
+    <string name="Denis">Денис Strangenaut</string>
     <string name="Alexander_Krylov">Александр Крылов</string>
 
 

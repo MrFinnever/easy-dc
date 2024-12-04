@@ -2,6 +2,8 @@
 <resources>
     <!-- General -->
     <string name="app_name">Easy DC</string>
+    <string name="version">Version:</string>
+    <string name="version_number">1.0.0</string>
     <string name="guide">Guide</string>
     <string name="calculator">Calculator</string>
     <string name="settings">Settings</string>
@@ -100,10 +102,10 @@
     <string name="Ivan_Lebedev">Ivan Lebedev</string>
     <string name="application">Application</string>
     <string name="Leonid_Krupenkov">Leonid Krupenkov</string>
-    <string name="Dmitry">Dmitriy</string>
+    <string name="Dmitry">Dmitriy Sluzhanin</string>
     <string name="credits">Credits</string>
     <string name="consultation">Consultation</string>
-    <string name="Denis">Denis</string>
+    <string name="Denis">Denis Strangenaut</string>
     <string name="Alexander_Krylov">Alexander Krylov</string>
 
 
