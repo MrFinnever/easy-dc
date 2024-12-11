@@ -354,6 +354,7 @@ fun BranchInputOutput(
                     color = LocalColors.current.onSurface
                 )
             },
+            textStyle = LocalTextStyles.current.standard,
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.node_number),
@@ -398,6 +399,7 @@ fun BranchInputOutput(
                     color = LocalColors.current.onSurface
                 )
             },
+            textStyle = LocalTextStyles.current.standard,
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.node_number),
@@ -462,6 +464,7 @@ fun BranchMultiComponent(
                             color = LocalColors.current.onSurface
                         )
                     },
+                    textStyle = LocalTextStyles.current.standard,
                     placeholder = {
                         Text(
                             text = placeholder,
