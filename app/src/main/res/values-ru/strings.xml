@@ -3,7 +3,7 @@
     <!-- General -->
     <string name="app_name">Easy DC</string>
     <string name="version">Версия:</string>
-    <string name="version_number">1.0.0</string>
+    <string name="version_number">1.1.0</string>
     <string name="guide">Теория</string>
     <string name="calculator">Калькулятор</string>
     <string name="settings">Настройки</string>
@@ -67,7 +67,7 @@
     <string name="language_russian">Русский</string>
     <string name="language_english">English</string>
 
-    <string name="app_theme">Тема приложения</string>
+    <string name="theme">Тема</string>
     <string name="light_theme_mode">Светлая</string>
     <string name="dark_theme_mode">Тёмная</string>
     <string name="system_theme_mode">Системная</string>
