@@ -26,6 +26,9 @@ class SettingsManager(private val context: Context) {
 
     val getSettings: Flow<SettingsData> = context.dataStore.data
         .map { preferences ->
+            Log.d("SettingsManager:getSettings", "Saved language: ${preferences[LANGUAGE_KEY]}")
+            Log.d("SettingsManager:getSettings", "Saved themeMode: ${preferences[THEME_MODE_KEY]}")
+            Log.d("SettingsManager:getSettings", "Saved fontSize: ${preferences[FONT_SIZE_KEY]}")
             SettingsData(
                 language = preferences[LANGUAGE_KEY] ?: "en",
                 themeMode = preferences[THEME_MODE_KEY] ?: "System",
@@ -37,11 +40,14 @@ class SettingsManager(private val context: Context) {
     //==================== Set All Settings ====================//
 
     suspend fun saveSettings(settings: SettingsData) {
-        Log.d("SettingsManager", "Saving language: ${settings.language}")
         context.dataStore.edit { preferences ->
-            preferences[LANGUAGE_KEY] = settings.language.toString()
+            preferences[LANGUAGE_KEY] = settings.language
             preferences[THEME_MODE_KEY] = settings.themeMode
             preferences[FONT_SIZE_KEY] = settings.fontSize
+            Log.d("SettingsManager:saveSettings", "Successfully saved language: ${preferences[LANGUAGE_KEY]}")
+            Log.d("SettingsManager:saveSettings", "Successfully saved themeMode: ${preferences[THEME_MODE_KEY]}")
+            Log.d("SettingsManager:saveSettings", "Successfully saved fontSize: ${preferences[FONT_SIZE_KEY]}")
         }
+
     }
 }
