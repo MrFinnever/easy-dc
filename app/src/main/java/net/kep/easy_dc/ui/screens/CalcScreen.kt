@@ -2,6 +2,7 @@ package net.kep.easy_dc.ui.screens
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,21 +17,25 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -42,13 +47,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.easy_dc.R
 import net.kep.easy_dc.data.calculator.BranchUI
 import net.kep.easy_dc.data.calculator.ErrorsInBranch
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.theme.LocalTextStyles
 import net.kep.easy_dc.ui.viewmodel.CalculatorViewModel
 
 
@@ -72,7 +78,8 @@ fun CalcScreen(
                 calcNavCon = calcNavCon,
                 calculatorViewModel = calculatorViewModel
             )
-        }
+        },
+        containerColor = LocalColors.current.background
     ) {
 
         Column(
@@ -128,19 +135,18 @@ fun CalcTopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.calculate_circuit),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = LocalTextStyles.current.navigationTitle.fontSize,
             )
         },
         actions = {
-            IconButton(
-                onClick = { calcNavCon.navigate(route = "help") }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.QuestionMark,
-                    contentDescription = "Help"
-                )
-            }
+//            IconButton(
+//                onClick = { calcNavCon.navigate(route = "help") }
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.QuestionMark,
+//                    contentDescription = "Help"
+//                )
+//            }
         },
         navigationIcon = {
             IconButton(
@@ -151,7 +157,13 @@ fun CalcTopAppBar(
                     contentDescription = "Back"
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = LocalColors.current.surface,
+            navigationIconContentColor = LocalColors.current.onSurface,
+            titleContentColor = LocalColors.current.onSurface,
+            actionIconContentColor = LocalColors.current.onSurface
+        )
     )
 }
 
@@ -165,7 +177,9 @@ fun ResultButton(
     ExtendedFloatingActionButton(
         onClick = {
             calculatorViewModel.makeResult(calcNavCon = calcNavCon)
-        }
+        },
+        containerColor = LocalColors.current.onSurface,
+        contentColor = LocalColors.current.surface
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -176,7 +190,7 @@ fun ResultButton(
             )
             Text(
                 text = stringResource(id = R.string.calculate),
-                fontSize = 22.sp,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
                 modifier = Modifier.padding(start = 5.dp)
             )
         }
@@ -200,6 +214,9 @@ fun AddBranchButton(
         Button(
             onClick = { vm.addBranch() },
             shape = MaterialTheme.shapes.medium,
+//            elevation = ButtonDefaults.buttonElevation(
+//                defaultElevation = 2.dp
+//            ),
             content = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -210,10 +227,14 @@ fun AddBranchButton(
                     )
                     Text(
                         text = stringResource(id = R.string.add_branch),
-                        fontSize = 18.sp
+                        fontSize = LocalTextStyles.current.standard.fontSize
                     )
                 }
-            }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = LocalColors.current.surface,
+                contentColor = LocalColors.current.onSurface
+            )
         )
     }
 }
@@ -229,6 +250,9 @@ fun BranchCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -291,8 +315,8 @@ fun BranchCardLabel(
 
         Text(
             text = stringResource(id = R.string.branch) + " $branchNumber",
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            fontSize = LocalTextStyles.current.cardTitle.fontSize,
+            color = LocalColors.current.onSurface
         )
 
         if (isRemovable) {
@@ -301,7 +325,8 @@ fun BranchCardLabel(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Branch"
+                    contentDescription = "Delete Branch",
+                    tint = LocalColors.current.elementOnSurface
                 )
             }
         }
@@ -325,13 +350,14 @@ fun BranchInputOutput(
             label = {
                 Text(
                     text = stringResource(id = R.string.input),
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = LocalTextStyles.current.standard.fontSize,
+                    color = LocalColors.current.onSurface
                 )
             },
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.node_number),
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = LocalTextStyles.current.standard.fontSize
                 )
             },
             shape = MaterialTheme.shapes.medium,
@@ -345,6 +371,20 @@ fun BranchInputOutput(
             },
             isError = errorsInBranch.isInputError.value,
             maxLines = 1,
+            colors = TextFieldDefaults.colors(
+                focusedSupportingTextColor = LocalColors.current.onSurface,
+                focusedPlaceholderColor = LocalColors.current.onSurface,
+                unfocusedPlaceholderColor = LocalColors.current.onSurface,
+                unfocusedTextColor = LocalColors.current.onSurface,
+                focusedTextColor = LocalColors.current.onSurface,
+                unfocusedLabelColor = LocalColors.current.onSurface,
+                focusedLabelColor = LocalColors.current.onSurface,
+                cursorColor = LocalColors.current.onSurface,
+                focusedIndicatorColor = LocalColors.current.primary,
+                focusedContainerColor = LocalColors.current.surface,
+                unfocusedIndicatorColor = LocalColors.current.onSurface.copy(0.3f),
+                unfocusedContainerColor = LocalColors.current.surface
+            ),
             modifier = Modifier
                 .padding(end = 5.dp)
                 .fillMaxWidth(0.49f)
@@ -354,13 +394,14 @@ fun BranchInputOutput(
             label = {
                 Text(
                     text = stringResource(id = R.string.output),
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = LocalTextStyles.current.standard.fontSize,
+                    color = LocalColors.current.onSurface
                 )
             },
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.node_number),
-                    color = MaterialTheme.colorScheme.onSurface
+                    fontSize = LocalTextStyles.current.standard.fontSize
                 )
             },
             shape = MaterialTheme.shapes.medium,
@@ -371,6 +412,20 @@ fun BranchInputOutput(
             onValueChange = { newText ->
                 output.value = newText
             },
+            colors = TextFieldDefaults.colors(
+                focusedSupportingTextColor = LocalColors.current.onSurface,
+                focusedPlaceholderColor = LocalColors.current.onSurface,
+                unfocusedPlaceholderColor = LocalColors.current.onSurface,
+                unfocusedTextColor = LocalColors.current.onSurface,
+                focusedTextColor = LocalColors.current.onSurface,
+                unfocusedLabelColor = LocalColors.current.onSurface,
+                focusedLabelColor = LocalColors.current.onSurface,
+                cursorColor = LocalColors.current.onSurface,
+                focusedIndicatorColor = LocalColors.current.primary,
+                focusedContainerColor = LocalColors.current.surface,
+                unfocusedIndicatorColor = LocalColors.current.onSurface.copy(0.3f),
+                unfocusedContainerColor = LocalColors.current.surface
+            ),
             isError = errorsInBranch.isOutputError.value,
             maxLines = 1,
             modifier = Modifier
@@ -403,13 +458,15 @@ fun BranchMultiComponent(
                     label = {
                         Text(
                             text = label,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontSize = LocalTextStyles.current.standard.fontSize,
+                            color = LocalColors.current.onSurface
                         )
                     },
                     placeholder = {
                         Text(
                             text = placeholder,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontSize = LocalTextStyles.current.standard.fontSize,
+                            color = LocalColors.current.onSurface
                         )
                     },
                     shape = MaterialTheme.shapes.medium,
@@ -420,6 +477,20 @@ fun BranchMultiComponent(
                     onValueChange = { newText ->
                         textFields[index] = newText
                     },
+                    colors = TextFieldDefaults.colors(
+                        focusedSupportingTextColor = LocalColors.current.onSurface,
+                        focusedPlaceholderColor = LocalColors.current.onSurface,
+                        unfocusedPlaceholderColor = LocalColors.current.onSurface,
+                        unfocusedTextColor = LocalColors.current.onSurface,
+                        focusedTextColor = LocalColors.current.onSurface,
+                        unfocusedLabelColor = LocalColors.current.onSurface,
+                        focusedLabelColor = LocalColors.current.onSurface,
+                        cursorColor = LocalColors.current.onSurface,
+                        focusedIndicatorColor = LocalColors.current.primary,
+                        focusedContainerColor = LocalColors.current.surface,
+                        unfocusedIndicatorColor = LocalColors.current.onSurface.copy(0.3f),
+                        unfocusedContainerColor = LocalColors.current.surface
+                    ),
                     isError = isError,
                     maxLines = 1,
                     modifier = if (index == 0) {
@@ -438,7 +509,11 @@ fun BranchMultiComponent(
                         },
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
-                        Icon(Icons.Default.RemoveCircle, contentDescription = "Delete parameter")
+                        Icon(
+                            Icons.Default.RemoveCircle,
+                            contentDescription = "Delete parameter",
+                            tint = LocalColors.current.elementOnSurface
+                        )
                     }
                 }
             }
@@ -447,6 +522,10 @@ fun BranchMultiComponent(
         OutlinedIconButton(
             shape = MaterialTheme.shapes.medium,
             onClick = { textFields.add("") },
+            colors =  IconButtonDefaults.iconButtonColors(
+                contentColor = LocalColors.current.onSurface
+            ),
+            border = BorderStroke(1.dp, LocalColors.current.onSurface.copy(0.3f)),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add parameter")
@@ -462,12 +541,22 @@ fun ErrorAlert(
 ) {
     AlertDialog(
         onDismissRequest = { calculatorViewModel.hideErrorAlert() },
+        containerColor = LocalColors.current.surface,
+        titleContentColor = LocalColors.current.onSurface,
+        textContentColor = LocalColors.current.onSurface,
         title = {
-            if (errorsInBranchList.size < 2)
-                Text(text = stringResource(id = R.string.error))
-            else
-                Text(text = stringResource(id = R.string.errors))
-                },
+            if (errorsInBranchList.size < 2) {
+                Text(
+                    text = stringResource(id = R.string.error),
+                    fontSize = LocalTextStyles.current.cardTitle.fontSize
+                )
+            }
+            else {
+                Text(
+                    text = stringResource(id = R.string.errors),
+                    fontSize = LocalTextStyles.current.cardTitle.fontSize
+                )
+            } },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
@@ -477,11 +566,10 @@ fun ErrorAlert(
                 errorsInBranchList.forEach { errors ->
                     Log.e("ErrorAlert", errors.messages.toString())
 
-                    // Проверяем, есть ли сообщения в списке
                     if (errors.messages.isNotEmpty()) {
                         Text(
                             text = errors.messages.last(),
-                            fontSize = 16.sp
+                            fontSize = LocalTextStyles.current.standard.fontSize
                         )
                     }
 
@@ -494,8 +582,17 @@ fun ErrorAlert(
 
         },
         confirmButton = {
-            Button(onClick = { calculatorViewModel.hideErrorAlert() }) {
-                Text(text = "OK")
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LocalColors.current.onSurface,
+                    contentColor = LocalColors.current.surface
+                ),
+                onClick = { calculatorViewModel.hideErrorAlert() }
+            ) {
+                Text(
+                    text = "OK",
+                    fontSize = LocalTextStyles.current.standard.fontSize
+                )
             }
         }
     )
