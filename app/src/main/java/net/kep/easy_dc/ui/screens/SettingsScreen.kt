@@ -8,6 +8,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Code
@@ -36,20 +36,22 @@ import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.SelfImprovement
-import androidx.compose.material.icons.filled.SensorOccupied
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -70,22 +72,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.launch
 import net.kep.easy_dc.R
 import net.kep.easy_dc.data.settings.SettingsManager
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.theme.LocalTextStyles
 import net.kep.easy_dc.ui.viewmodel.SettingsViewModel
 import java.util.Locale
 
 @Composable
 fun SettingsScreen(
-    //settingsData: SettingsData,
+    settingsViewModel: SettingsViewModel,
     settingsManager: SettingsManager
 ) {
-    val settingsViewModel = SettingsViewModel(settingsManager)
+
     val language by settingsViewModel.language.collectAsState()
-    val themeMode = settingsViewModel.themeMode.collectAsState()
+    val themeMode by settingsViewModel.themeMode.collectAsState()
     val fontSize = settingsViewModel.fontSize.collectAsState()
 
     settingsManager.getSettings
@@ -95,6 +98,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(LocalColors.current.background)
             .verticalScroll(rememberScrollState())
     ) {
         AppPresentation()
@@ -105,14 +109,16 @@ fun SettingsScreen(
             language = language,
             settingsViewModel = settingsViewModel
         )
-//        ThemeSelectionScreen(
-//            currentTheme = themeMode.value,
-//            onThemeChanged = updateTheme
-//        )
-//        FontSize(
-//            currentFontSize = fontSize.value,
-//            onFontSizeChanged = updateFontSize
-//        )
+
+        ThemeMode(
+            currentTheme = themeMode,
+            settingsViewModel = settingsViewModel
+        )
+
+        FontSize(
+            currentFontSize = fontSize.value,
+            settingsViewModel = settingsViewModel
+        )
 
         Spacer(modifier = Modifier.padding(5.dp))
 
@@ -136,6 +142,7 @@ private fun AppPresentation() {
         modifier = Modifier
             .padding(top = 40.dp)
             .fillMaxWidth()
+            .background(LocalColors.current.background)
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -151,13 +158,16 @@ private fun AppPresentation() {
         }
         Text(
             text = stringResource(id = R.string.app_name),
-            fontSize = 26.sp,
+            fontSize = LocalTextStyles.current.title.fontSize,
+            color = LocalColors.current.onBackground,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(top = 10.dp)
         )
         Text(
-            text = "Версия: 0.1.1",
-            fontSize = 14.sp,
+            text = stringResource(id = R.string.version) + " "
+                    + stringResource(id = R.string.version_number),
+            fontSize = LocalTextStyles.current.subText.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier.padding(top = 0.dp)
         )
     }
@@ -187,12 +197,17 @@ private fun Language(
     val coroutineScope = rememberCoroutineScope()
 
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
         modifier = Modifier
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.medium)
             .clickable { showModalBottomSheet = true }
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -207,11 +222,11 @@ private fun Language(
                 Icon(
                     imageVector = Icons.Default.Translate,
                     contentDescription = "Language",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = LocalColors.current.onSurface
                 )
                 Text(
                     text = stringResource(id = R.string.language),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -222,8 +237,8 @@ private fun Language(
             ) {
                 Text(
                     text = if (language == "ru") russianLanguage else englishLanguage,
-                    color = MaterialTheme.colorScheme.surfaceTint,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = LocalColors.current.settingsTextIndicator,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(end = 5.dp)
                 )
@@ -245,6 +260,8 @@ private fun Language(
                     showModalBottomSheet = false
                 }
             },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
             sheetState = sheetState
         ) {
             Column(
@@ -254,40 +271,67 @@ private fun Language(
                 ListItem(
                     modifier = Modifier.clickable {
                         settingsViewModel.getSettings()
-                        settingsViewModel.setSettings("ru")
+                        settingsViewModel.setLanguage("ru")
                         updateLanguage(context, "ru")
                     },
-                    headlineContent = { Text(russianLanguage) },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.language_russian),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
                     trailingContent = {
                         RadioButton(
                             selected = language == "ru",
                             onClick = {
                                 settingsViewModel.getSettings()
-                                settingsViewModel.setSettings("ru")
+                                settingsViewModel.setLanguage("ru")
                                 updateLanguage(context, "ru")
-                            }
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = LocalColors.current.primary,
+                                unselectedColor = LocalColors.current.onSurface
+                            )
                         )
-                    }
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.primary
+                    )
                 )
 
 
                 ListItem(
                     modifier = Modifier.clickable {
                         settingsViewModel.getSettings()
-                        settingsViewModel.setSettings("en")
+                        settingsViewModel.setLanguage("en")
                         updateLanguage(context, "en")
                     },
-                    headlineContent = { Text(stringResource(id = R.string.language_english)) },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.language_english),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        ) },
                     trailingContent = {
                         RadioButton(
                             selected = language != "ru",
                             onClick = {
                                 settingsViewModel.getSettings()
-                                settingsViewModel.setSettings("en")
+                                settingsViewModel.setLanguage("en")
                                 updateLanguage(context, "en")
-                            }
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = LocalColors.current.primary,
+                                unselectedColor = LocalColors.current.onSurface
+                            )
                         )
-                    }
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.primary
+                    )
                 )
 
                 Spacer(modifier = Modifier.padding(vertical = 50.dp))
@@ -327,10 +371,12 @@ private fun Context.findActivity(): Activity? = when (this) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ThemeSelectionScreen(
+private fun ThemeMode(
     currentTheme: String,
-    onThemeChanged: (String) -> Unit
+    settingsViewModel: SettingsViewModel
 ) {
+    Log.d("SettingsScreen:ThemeMode", "currentTheme: $currentTheme")
+
     var showModalBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -339,16 +385,19 @@ private fun ThemeSelectionScreen(
     val darkThemeMode = stringResource(id = R.string.dark_theme_mode)
     val systemThemeMode = stringResource(id = R.string.system_theme_mode)
 
-    var selectedTheme by remember { mutableStateOf(currentTheme) }
-
-    val displayThemeMode = when (selectedTheme) {
+    val displayThemeMode = when (currentTheme) {
         "Light" -> lightThemeMode
         "Dark" -> darkThemeMode
         "System" -> systemThemeMode
         else -> systemThemeMode
     }
+    Log.d("SettingsScreen:ThemeMode", "displayThemeMode: $displayThemeMode")
 
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
             .padding(top = 10.dp)
@@ -369,12 +418,11 @@ private fun ThemeSelectionScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.FormatPaint,
-                    contentDescription = "Theme",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    contentDescription = "Theme"
                 )
                 Text(
-                    text = "Тема",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    text = stringResource(id = R.string.theme),
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -384,8 +432,8 @@ private fun ThemeSelectionScreen(
             ) {
                 Text(
                     text = displayThemeMode,
-                    color = MaterialTheme.colorScheme.surfaceTint,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = LocalColors.current.settingsTextIndicator,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(end = 5.dp)
                 )
@@ -407,6 +455,9 @@ private fun ThemeSelectionScreen(
                     showModalBottomSheet = false
                 }
             },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
+
             sheetState = sheetState
         ) {
             Column(
@@ -416,59 +467,244 @@ private fun ThemeSelectionScreen(
                 
                 ListItem(
                     modifier = Modifier.clickable {
-                        selectedTheme = "Light"
-                        onThemeChanged("Light")
+                        settingsViewModel.setThemeMode("Light")
+                        Log.d("SettingsScreen", "Pressed Set Light Theme")
                     },
-                    headlineContent = { Text("Светлая") },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.light_theme_mode),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        ) },
                     trailingContent = {
                         RadioButton(
-                            selected = selectedTheme == "Light",
+                            selected = currentTheme == "Light",
                             onClick = {
-                                selectedTheme = "Light"
-                                onThemeChanged("Light")
-                            }
+                                settingsViewModel.setThemeMode("Light")
+                                Log.d("SettingsScreen", "Pressed Set Light Theme")
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = LocalColors.current.primary,
+                                unselectedColor = LocalColors.current.onSurface
+                            )
                         )
-                    }
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.primary
+                    )
                 )
 
 
                 ListItem(
                     modifier = Modifier.clickable {
-                        selectedTheme = "Dark"
-                        onThemeChanged("Dark")
+                        settingsViewModel.setThemeMode("Dark")
+                        Log.d("SettingsScreen", "Pressed Set Dark Theme")
                     },
-                    headlineContent = { Text("Тёмная") },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.dark_theme_mode),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        ) },
                     trailingContent = {
                         RadioButton(
-                            selected = selectedTheme == "Dark",
+                            selected = currentTheme == "Dark",
                             onClick = {
-                                selectedTheme = "Light"
-                                onThemeChanged("Light")
-                            }
+                                settingsViewModel.setThemeMode("Dark")
+                                Log.d("SettingsScreen", "Pressed Set Dark Theme")
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = LocalColors.current.primary,
+                                unselectedColor = LocalColors.current.onSurface
+                            )
                         )
-                    }
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.primary
+                    )
                 )
 
                 ListItem(
                     modifier = Modifier.clickable {
-                        selectedTheme = "System"
-                        onThemeChanged("System")
+                        settingsViewModel.setThemeMode("System")
+                        Log.d("SettingsScreen", "Pressed Set System Theme")
                     },
-                    headlineContent = { Text("System") },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.system_theme_mode),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        ) },
                     trailingContent = {
                         RadioButton(
-                            selected = selectedTheme == "System",
+                            selected = currentTheme == "System",
                             onClick = {
-                                selectedTheme = "System"
-                                onThemeChanged("System")
-                            }
+                                settingsViewModel.setThemeMode("System")
+                                Log.d("SettingsScreen", "Pressed Set Dark Theme")
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = LocalColors.current.primary,
+                                unselectedColor = LocalColors.current.onSurface
+                            )
                         )
-                    }
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.primary
+                    )
                 )
 
                 Spacer(modifier = Modifier.padding(vertical = 50.dp))
             }
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FontSize(
+    currentFontSize: Int,
+    settingsViewModel: SettingsViewModel
+) {
+    val context = LocalContext.current
+
+    var showModalBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var fontSize by remember { mutableFloatStateOf(currentFontSize.toFloat()) }
+    var fontSizeName by remember { mutableStateOf(getFontSizeName(fontSize, context)) }
+
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+            .clickable { showModalBottomSheet = true }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FontDownload,
+                    contentDescription = "Font Size"
+                )
+                Text(
+                    text = stringResource(id = R.string.font_size),
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = fontSizeName,
+                    color = LocalColors.current.settingsTextIndicator,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = "Choose",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+        }
+    }
+
+    if (showModalBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    showModalBottomSheet = false
+                }
+            },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.FontDownload,
+                            contentDescription = "Font Size"
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.font_size) + ": $fontSizeName",
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        leadingIconColor = LocalColors.current.onSurface
+                    )
+                )
+
+                Slider(
+                    value = fontSize,
+                    steps = 3,
+                    valueRange = 1f..5f,
+                    onValueChange = {
+                        fontSize = it
+                        fontSizeName = getFontSizeName(it, context)
+                        settingsViewModel.setFontSize(it.toInt())
+                    },
+                    onValueChangeFinished = {
+                    },
+                    colors = SliderDefaults.colors(
+                        thumbColor = LocalColors.current.primary,
+                        activeTrackColor = LocalColors.current.primary,
+                        disabledInactiveTickColor = LocalColors.current.primary
+                    ),
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
+
+
+
+                Spacer(modifier = Modifier.padding(vertical = 50.dp))
+            }
+        }
+    }
+}
+
+
+private fun getFontSizeName(fontSize: Float, context: Context): String {
+    return when (fontSize) {
+        1f -> context.getString(R.string.font_size_very_small)
+        2f -> context.getString(R.string.font_size_small)
+        3f -> context.getString(R.string.font_size_medium)
+        4f -> context.getString(R.string.font_size_large)
+        5f -> context.getString(R.string.font_size_very_large)
+        else -> context.getString(R.string.font_size_medium)
     }
 }
 
@@ -481,7 +717,11 @@ private fun Authors() {
     val coroutineScope = rememberCoroutineScope()
 
     Card(
-        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
@@ -502,335 +742,11 @@ private fun Authors() {
                 Icon(
                     imageVector = Icons.Default.Diversity1,
                     contentDescription = "Team",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = LocalColors.current.onSurface
                 )
                 Text(
-                    text = "Команда проекта",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                contentDescription = "Choose",
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-
-    if (showModalBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
-                    showModalBottomSheet = false
-                }
-            },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.Diversity1,
-                            contentDescription = "Team",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Команда проекта"
-                        )
-                    }
-                )
-
-                Divider()
-
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.SelfImprovement,
-                            contentDescription = "Sound",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Куратор проекта"
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Александра Ларионова"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-
-                Divider()
-
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.Code,
-                            contentDescription = "Sound",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Иван Лебедев"
-                        )
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Программа"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.Smartphone,
-                            contentDescription = "Sound",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Приложение"
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Леонид Крупеньков"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                            contentDescription = "Sound",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Теория"
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Дмитрий"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-                Spacer(modifier = Modifier.padding(vertical = 50.dp))
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun Credits() {
-    var showModalBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
-
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier
-            .padding(top = 10.dp)
-            .padding(horizontal = 10.dp)
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-            .clickable { showModalBottomSheet = true }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Handshake,
-                    contentDescription = "Team",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Благодарности",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                contentDescription = "Choose",
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-
-
-    if (showModalBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                coroutineScope.launch {
-                    sheetState.hide()  // Закрытие листа с анимацией
-                    showModalBottomSheet = false
-                }
-            },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.SensorOccupied,
-                            contentDescription = "Team",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Сопровождение"
-                        )
-                    }
-                )
-
-                Divider()
-
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.QuestionAnswer,
-                            contentDescription = "Consulting",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Консультация"
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Денис"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.QuestionAnswer,
-                            contentDescription = "Consulting",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    overlineContent = {
-                        Text(
-                            text = "Консультация"
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Александр Крылов"
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
-                        }
-                    }
-                )
-
-                Spacer(modifier = Modifier.padding(vertical = 50.dp))
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AboutApp() {
-    var showModalBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
-
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier
-            .padding(top = 10.dp)
-            .padding(horizontal = 10.dp)
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-            .clickable { showModalBottomSheet = true }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Work,
-                    contentDescription = "About Project",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = stringResource(id = R.string.about_project),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    text = stringResource(id = R.string.project_team),
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -852,16 +768,439 @@ private fun AboutApp() {
                     showModalBottomSheet = false
                 }
             },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Diversity1,
+                            contentDescription = "Team"
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.project_team),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+
+                )
+
+                Divider(
+                    color = LocalColors.current.divider
+                )
+
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.SelfImprovement,
+                            contentDescription = "Sound"
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.project_supervisor),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Alexandra_Larionova),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+
+                Divider(
+                    color = LocalColors.current.divider
+                )
+
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Code,
+                            contentDescription = "Sound"
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Ivan_Lebedev),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.program),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Smartphone,
+                            contentDescription = "Sound"
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.application),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Leonid_Krupenkov),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                            contentDescription = "Sound"
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.guide),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Dmitry),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+                Spacer(modifier = Modifier.padding(vertical = 50.dp))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Credits() {
+    var showModalBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.large,
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+            .clickable { showModalBottomSheet = true }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Handshake,
+                    contentDescription = "Team",
+                    tint = LocalColors.current.onSurface
+                )
+                Text(
+                    text = stringResource(id = R.string.credits),
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = "Choose",
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+
+
+    if (showModalBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    showModalBottomSheet = false
+                }
+            },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Handshake,
+                            contentDescription = "Team"
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.credits),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+
+                Divider(
+                    color = LocalColors.current.divider
+                )
+
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.QuestionAnswer,
+                            contentDescription = "Consulting"
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.consultation),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize,
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Denis),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.QuestionAnswer,
+                            contentDescription = "Consulting"
+                        )
+                    },
+                    overlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.consultation),
+                            fontSize = LocalTextStyles.current.settingsSubItem.fontSize,
+                        )
+                    },
+                    headlineContent = {
+                        Text(
+                            text = stringResource(id = R.string.Alexander_Krylov),
+                            fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                        )
+                    },
+//                    trailingContent = {
+//                        IconButton(
+//                            onClick = { /*TODO*/ }
+//                        ) {
+//                            Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Profile")
+//                        }
+//                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = LocalColors.current.surface,
+                        headlineColor = LocalColors.current.onSurface,
+                        overlineColor = LocalColors.current.overlineText,
+
+                        leadingIconColor = LocalColors.current.onSurface,
+                        trailingIconColor = LocalColors.current.onSurface
+                    )
+                )
+
+                Spacer(modifier = Modifier.padding(vertical = 50.dp))
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AboutApp() {
+    var showModalBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val coroutineScope = rememberCoroutineScope()
+
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.large,
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+            .clickable { showModalBottomSheet = true }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Work,
+                    contentDescription = "About Project",
+                    tint = LocalColors.current.onSurface
+                )
+                Text(
+                    text = stringResource(id = R.string.about_project),
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
+                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                contentDescription = "Choose",
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+
+    if (showModalBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    showModalBottomSheet = false
+                }
+            },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
             sheetState = sheetState
         ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = localizedText(),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontSize = LocalTextStyles.current.standard.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -891,11 +1230,13 @@ private fun localizedText(): String {
 @Composable
 private fun OpenSource() {
     val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
 
     Card(
-        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
@@ -922,11 +1263,11 @@ private fun OpenSource() {
                 Icon(
                     imageVector = Icons.Default.Code,
                     contentDescription = "About Project",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = LocalColors.current.onSurface
                 )
                 Text(
                     text = stringResource(id = R.string.open_source),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -950,7 +1291,11 @@ private fun License() {
     val coroutineScope = rememberCoroutineScope()
 
     Card(
-        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface
+        ),
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(top = 10.dp, bottom = 20.dp)
             .padding(horizontal = 10.dp)
@@ -971,11 +1316,11 @@ private fun License() {
                 Icon(
                     imageVector = Icons.Default.Policy,
                     contentDescription = "About Project",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = LocalColors.current.onSurface
                 )
                 Text(
                     text = stringResource(id = R.string.license),
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontSize = LocalTextStyles.current.settingsItem.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
@@ -997,6 +1342,8 @@ private fun License() {
                     showModalBottomSheet = false
                 }
             },
+            containerColor = LocalColors.current.surface,
+            contentColor = LocalColors.current.onSurface,
             sheetState = sheetState
         ) {
             LicenseDescription()
@@ -1014,12 +1361,12 @@ fun LicenseDescription() {
     ) {
         Text(
             text = stringResource(id = R.string.app_under_license),
-            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+            fontSize = LocalTextStyles.current.standard.fontSize,
             fontStyle = MaterialTheme.typography.titleMedium.fontStyle
         )
         Text(
             text = stringResource(id = R.string.license_rights),
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            fontSize = LocalTextStyles.current.title.fontSize,
             fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
             fontWeight = FontWeight.W500,
             modifier = Modifier
@@ -1028,15 +1375,15 @@ fun LicenseDescription() {
         )
 
 
-        RightCard(
+        RightsCard(
             right = stringResource(id = R.string.license_right_use),
             icon = Icons.Default.AutoAwesome
         )
-        RightCard(
+        RightsCard(
             right = stringResource(id = R.string.license_right_modify),
             icon = Icons.Default.AutoFixHigh
         )
-        RightCard(
+        RightsCard(
             right = stringResource(id = R.string.license_right_share),
             icon = Icons.Default.Diversity3
         )
@@ -1048,11 +1395,15 @@ fun LicenseDescription() {
 }
 
 @Composable
-fun RightCard(
+fun RightsCard(
     right: String,
     icon: ImageVector
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.primary,
+            contentColor = LocalColors.current.onPrimary
+        ),
         shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(vertical = 10.dp)
@@ -1070,147 +1421,16 @@ fun RightCard(
             ) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = right,
-                    tint = MaterialTheme.colorScheme.onSurface
+                    contentDescription = right
                 )
                 Text(
                     text = right,
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontSize = LocalTextStyles.current.bigButtonsText.fontSize,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     modifier = Modifier.padding(start = 10.dp)
                 )
             }
         }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FontSize(
-    currentFontSize: Int,
-    onFontSizeChanged: (Int) -> Unit
-) {
-    val context = LocalContext.current
-
-    var showModalBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScope = rememberCoroutineScope()
-
-    var fontSize by remember { mutableFloatStateOf(currentFontSize.toFloat()) }
-    var fontSizeName by remember { mutableStateOf(getFontSizeName(fontSize, context)) }
-
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier
-            .padding(top = 10.dp)
-            .padding(horizontal = 10.dp)
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-            .clickable { showModalBottomSheet = true }
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(start = 20.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FontDownload,
-                    contentDescription = "Font Size",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Размер шрифта",
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = fontSizeName,
-                    color = MaterialTheme.colorScheme.surfaceTint,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                    contentDescription = "Choose",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-        }
-    }
-
-    if (showModalBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    showModalBottomSheet = false
-                }
-            },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            imageVector = Icons.Default.FontDownload,
-                            contentDescription = "Font Size",
-                            tint = MaterialTheme.colorScheme.onSurface)
-                    },
-                    headlineContent = {
-                        Text(
-                            text = "Размер шрифта: $fontSizeName"
-                        )
-                    }
-                )
-
-                Slider(
-                    value = fontSize,
-                    steps = 3,
-                    valueRange = 1f..5f,
-                    onValueChange = {
-                        fontSize = it
-                        fontSizeName = getFontSizeName(it, context)
-                    },
-                    onValueChangeFinished = {
-                        onFontSizeChanged(fontSize.toInt())
-                    },
-                    modifier = Modifier.padding(horizontal = 20.dp)
-                )
-
-
-
-                Spacer(modifier = Modifier.padding(vertical = 50.dp))
-            }
-        }
-    }
-}
-
-
-private fun getFontSizeName(fontSize: Float, context: Context): String {
-    return when (fontSize) {
-        1f -> context.getString(R.string.font_size_very_small)
-        2f -> context.getString(R.string.font_size_small)
-        3f -> context.getString(R.string.font_size_medium)
-        4f -> context.getString(R.string.font_size_large)
-        5f -> context.getString(R.string.font_size_very_large)
-        else -> context.getString(R.string.font_size_medium)
     }
 }
 

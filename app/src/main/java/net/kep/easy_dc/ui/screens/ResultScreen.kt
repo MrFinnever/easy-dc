@@ -2,6 +2,7 @@ package net.kep.easy_dc.ui.screens
 
 import android.app.Application
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,17 +17,22 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,14 +45,16 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.easy_dc.R
 import net.kep.easy_dc.data.calculator.BranchResultUI
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.theme.LocalTextStyles
 import net.kep.easy_dc.ui.viewmodel.CalculatorViewModel
 import kotlin.math.absoluteValue
 
@@ -86,18 +94,33 @@ fun ResultScreen(
                     selectedTab = selectedTab
                 )
             }
-        }
+        },
+        containerColor = LocalColors.current.background
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
         ) {
             TabRow(
-                selectedTabIndex = selectedTab.ordinal
+                containerColor = LocalColors.current.surface,
+                contentColor = LocalColors.current.onSurface,
+                selectedTabIndex = selectedTab.ordinal,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.ordinal]),
+                        color = LocalColors.current.onSurface,
+                        height = 2.dp
+                    )
+                }
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        text = { Text(title) },
+                        text = {
+                            Text(
+                                text = title,
+                                fontSize = LocalTextStyles.current.standard.fontSize,
+                                fontWeight = FontWeight.Normal
+                            ) },
                         selected = selectedTab.ordinal == index,
                         onClick = { selectedTab = Tabs.entries[index] }
                     )
@@ -154,8 +177,7 @@ private fun ResultTopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.result),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = LocalTextStyles.current.navigationTitle.fontSize
             )
         },
         navigationIcon = {
@@ -167,7 +189,13 @@ private fun ResultTopAppBar(
                     contentDescription = "Back"
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = LocalColors.current.surface,
+            navigationIconContentColor = LocalColors.current.onSurface,
+            titleContentColor = LocalColors.current.onSurface,
+            actionIconContentColor = LocalColors.current.onSurface
+        )
     )
 }
 
@@ -179,6 +207,9 @@ fun ResultCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -217,8 +248,8 @@ private fun ResultCardLabel(
     ) {
         Text(
             text = stringResource(id = R.string.branch) + " ${branch.id}",
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            fontSize = LocalTextStyles.current.cardTitle.fontSize,
+            color = LocalColors.current.onSurface
         )
         OutlinedIconButton(
             onClick = {
@@ -232,6 +263,10 @@ private fun ResultCardLabel(
                     Toast.LENGTH_SHORT
                 ).show()
             },
+            colors =  IconButtonDefaults.iconButtonColors(
+                contentColor = LocalColors.current.onSurface
+            ),
+            border = BorderStroke(1.dp, LocalColors.current.onSurface),
             shape = MaterialTheme.shapes.large
         ) {
             Icon(
@@ -250,6 +285,9 @@ private fun DCValueCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.resultCardAccent
+        ),
         modifier = modifier
             .fillMaxWidth()
     ) {
@@ -257,9 +295,12 @@ private fun DCValueCard(
         Text(
             text = "I = " + formatDoubleToString(dcValue)
                     + " " + stringResource(id = R.string.ampere),
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.horizontalScroll(rememberScrollState())
+            fontSize = LocalTextStyles.current.cardTitle.fontSize,
+            color = LocalColors.current.onResultCardAccent,
+            modifier = Modifier
+                .padding(10.dp)
+                .padding(start = 10.dp)
+                .horizontalScroll(rememberScrollState())
         )
     }
 }
@@ -274,7 +315,8 @@ private fun CopyAllFAB(
     val context = LocalContext.current
 
     ExtendedFloatingActionButton(
-
+        containerColor = LocalColors.current.onSurface,
+        contentColor = LocalColors.current.surface,
         onClick = {
             if (selectedTab == Tabs.RESULT) {
                     val allBranchCurrents = listBranchResult
@@ -300,8 +342,7 @@ private fun CopyAllFAB(
                 contentDescription = "Copy all")
             Text(
                 text = stringResource(id = R.string.copy_all),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
                 modifier = Modifier.padding(start = 5.dp)
             )
         }

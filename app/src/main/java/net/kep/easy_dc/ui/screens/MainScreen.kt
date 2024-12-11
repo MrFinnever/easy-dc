@@ -1,11 +1,10 @@
 package net.kep.easy_dc.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,9 +12,12 @@ import net.kep.easy_dc.data.settings.SettingsManager
 import net.kep.easy_dc.ui.navigation.CalcNavHost
 import net.kep.easy_dc.ui.navigation.NavBar
 import net.kep.easy_dc.ui.navigation.NavRoutes
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.viewmodel.SettingsViewModel
 
 @Composable
 fun MainScreen(
+    settingsViewModel: SettingsViewModel,
     settingsManager: SettingsManager
 ) {
     val mainNavCon = rememberNavController()
@@ -26,25 +28,18 @@ fun MainScreen(
         NavHost(
             navController = mainNavCon,
             startDestination = NavRoutes.Calculator.route,
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(it).background(LocalColors.current.background)
         ) {
-            composable(NavRoutes.Guide.route) { GuideScreen() }
+            composable(NavRoutes.Guide.route) { GuideScreen(settingsViewModel) }
             composable(NavRoutes.Calculator.route) {
                 CalcNavHost(mainNavCon)
             }
             composable(NavRoutes.Settings.route) {
-                SettingsScreen(settingsManager = settingsManager)
+                SettingsScreen(
+                    settingsViewModel = settingsViewModel,
+                    settingsManager = settingsManager
+                )
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    val context = LocalContext.current
-    MainScreen(
-        settingsManager = SettingsManager(context.applicationContext)
-    )
 }

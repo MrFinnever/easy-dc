@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,11 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import net.kep.easy_dc.R
 import net.kep.easy_dc.ui.navigation.NavRoutes
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.theme.LocalTextStyles
 
 @Composable
 fun GreetingScreen(
@@ -39,12 +41,17 @@ fun GreetingScreen(
         ) {
             Text(
                 text = stringResource(id = R.string.app_name),
-                fontSize = 48.sp,
+                fontSize = LocalTextStyles.current.bigTitle.fontSize,
+                color = LocalColors.current.onBackground,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(10.dp)
             )
             Button(
                 shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LocalColors.current.primary,
+                    contentColor = LocalColors.current.onPrimary
+                ),
                 modifier = Modifier
                     .padding(10.dp)
                     .height(70.dp)
@@ -55,10 +62,14 @@ fun GreetingScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.calculation),
-                    fontSize = 25.sp
+                    fontSize = LocalTextStyles.current.bigButtonsText.fontSize
                 )
             }
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LocalColors.current.primary,
+                    contentColor = LocalColors.current.onPrimary
+                ),
                 shape = MaterialTheme.shapes.large,
                 modifier = Modifier
                     .padding(10.dp)
@@ -70,8 +81,7 @@ fun GreetingScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.guide),
-                    fontSize = 25.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    fontSize = LocalTextStyles.current.bigButtonsText.fontSize
                 )
             }
         }

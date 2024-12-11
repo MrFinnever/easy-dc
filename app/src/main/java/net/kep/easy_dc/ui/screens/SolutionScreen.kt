@@ -2,6 +2,7 @@ package net.kep.easy_dc.ui.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -26,7 +27,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
@@ -56,6 +59,8 @@ import net.kep.easy_dc.data.calculator.solution.sle.FreeFactors
 import net.kep.easy_dc.data.calculator.solution.sle.Matrix
 import net.kep.easy_dc.data.calculator.solution.sle.Rows
 import net.kep.easy_dc.data.calculator.solution.sle.SLEData
+import net.kep.easy_dc.ui.theme.LocalColors
+import net.kep.easy_dc.ui.theme.LocalTextStyles
 
 
 @Composable
@@ -74,6 +79,7 @@ fun SolutionScreen(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
+            .background(LocalColors.current.background)
             .padding(bottom = 20.dp)
     ) {
         StepOne(
@@ -128,7 +134,8 @@ private fun StepOne(
     ) {
         Text(
             text = stringResource(id = R.string.step_1),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(top = 10.dp)
                 .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -160,6 +167,9 @@ private fun BranchSolutionCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         BranchSolutionLabel(
@@ -196,20 +206,25 @@ private fun BranchSolutionLabel(
 
         Text(
             text = stringResource(id = R.string.branch) + " $branchNumber",
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardTitle.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier.padding(start = 10.dp)
         )
 
         OutlinedIconButton(
             onClick = {
-                val params = "Branch ID = ${branch.id}\n" +
-                        "Input Node = ${branch.inputNode}\n" +
-                        "Output Node = ${branch.outputNode}\n" +
-                        "Summarized EMF = ${branch.summarizedEMF
-                            .toString().replace(".", ",")} V\n" +
-                        "Summarized Resistance = ${branch.summarizedResistance
-                            .toString().replace(".", ",")} Ohm"
+                val params =
+                    context.getString(R.string.branch)  + " = ${branch.id}\n" +
+                            context.getString(R.string.input) + " = ${branch.inputNode}\n" +
+                            context.getString(R.string.output) + " = ${branch.outputNode}\n" +
+                            context.getString(R.string.emf) +
+                            " = ${branch.summarizedEMF.toString()
+                                .replace(".", ",")}"  +
+                            " " + context.getString(R.string.volt) + "\n" +
+                            context.getString(R.string.resistance) +
+                            " = ${branch.summarizedResistance.toString()
+                                .replace(".", ",")}"  +
+                            " " + context.getString(R.string.ohm) + "\n"
 
                 clipboardManager.setText(
                     AnnotatedString(params)
@@ -220,6 +235,10 @@ private fun BranchSolutionLabel(
                 ).show()
             },
             shape = MaterialTheme.shapes.large,
+            colors =  IconButtonDefaults.iconButtonColors(
+                contentColor = LocalColors.current.onSurface
+            ),
+            border = BorderStroke(1.dp, LocalColors.current.onSurface),
             modifier = Modifier.padding(end = 10.dp)
         ) {
             Icon(
@@ -240,11 +259,15 @@ private fun BranchSolutionParams(
     summarizedResistance: Double
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = Modifier
-            .padding(10.dp)
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
     ) {
-        Column {
+        Column(
+        ) {
             BranchSolutionInput(
                 inputNode = inputNode,
                 modifier = Modifier
@@ -270,7 +293,7 @@ private fun BranchSolutionParams(
                 summarizedResistance = summarizedResistance,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 20.dp)
             )
         }
     }
@@ -287,10 +310,10 @@ private fun BranchSolutionInput(
     ) {
         Text(
             text = stringResource(id = R.string.input) + ": $inputNode",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardText.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier
-                .padding(start = 20.dp)
+                .padding(start = 10.dp)
         )
     }
 }
@@ -307,10 +330,10 @@ private fun BranchSolutionOutput(
 
         Text(
             text = stringResource(id = R.string.output) + ": $outputNode",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardText.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier
-                .padding(start = 20.dp)
+                .padding(start = 10.dp)
         )
     }
 }
@@ -329,10 +352,10 @@ private fun BranchSolutionEMF(
             text = stringResource(id = R.string.emf)
                     + ": $emf "
                     + stringResource(id = R.string.volt),
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardText.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier
-                .padding(start = 20.dp)
+                .padding(start = 10.dp)
                 .fillMaxWidth()
         )
     }
@@ -353,10 +376,10 @@ private fun BranchSolutionResistance(
             text = stringResource(id = R.string.resistance)
                     + ": $resistance "
                     + stringResource(id = R.string.ohm),
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardText.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier
-                .padding(start = 20.dp)
+                .padding(start = 10.dp)
                 .fillMaxWidth()
         )
     }
@@ -374,7 +397,8 @@ private fun StepTwo(
     ) {
         Text(
             text = stringResource(id = R.string.step_2),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -395,6 +419,9 @@ private fun ListOfNodes(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column(
@@ -414,8 +441,8 @@ private fun ListOfNodes(
             else {
                 Text(
                     text =  stringResource(id = R.string.number_of_nodes) + ": ${list.size}",
-                    fontSize = 22.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                    color = LocalColors.current.onSurface,
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
@@ -435,21 +462,27 @@ fun Nodes(
     modifier: Modifier
 ) {
     Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.secondaryCard
+        ),
         modifier = modifier
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(start = 10.dp)
+        ) {
             Text(
                 text = stringResource(id = R.string.node_numbers),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardText.fontSize,
+                color = LocalColors.current.onSecondaryCard,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             )
         }
         LazyVerticalGrid(
             columns = GridCells.FixedSize(48.dp),
             modifier = Modifier
-                .padding(top = 10.dp)
-                .padding(horizontal = 10.dp)
+                .padding(start = 10.dp)
+                .padding(vertical = 10.dp, horizontal = 10.dp)
                 .heightIn(max = 400.dp)
         ) {
             items(list.size) {
@@ -467,6 +500,7 @@ fun Nodes(
                     )
                     Text(
                         text = "${list[it]}",
+                        fontSize = LocalTextStyles.current.subText.fontSize,
                         color = Color.White
                     )
                 }
@@ -487,7 +521,8 @@ private fun StepThree(
     ) {
         Text(
             text = stringResource(id = R.string.step_3),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -508,6 +543,9 @@ private fun AmountOfComponents(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column(
@@ -526,8 +564,8 @@ private fun AmountOfComponents(
                 Text(
                     text = stringResource(id = R.string.connected_components)
                             + ": ${amount.intValue}",
-                    fontSize = 22.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                    color = LocalColors.current.onSurface,
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
@@ -564,7 +602,8 @@ private fun StepFour(
     ) {
         Text(
         text = stringResource(id = R.string.step_4),
-        fontSize = 22.sp,
+        fontSize = LocalTextStyles.current.stepTitle.fontSize,
+        color = LocalColors.current.onBackground,
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
     )
@@ -577,6 +616,9 @@ private fun StepFour(
 fun ChecksCard() {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = Modifier.padding(vertical = 10.dp, horizontal = 20.dp)
     ) {
         Column(
@@ -584,8 +626,8 @@ fun ChecksCard() {
         ) {
             Text(
                 text = stringResource(id = R.string.checks),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                color = LocalColors.current.onSurface,
                 modifier = Modifier.padding(start = 10.dp)
             )
             CircuitContinuous()
@@ -599,6 +641,9 @@ fun ChecksCard() {
 private fun CircuitContinuous() {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = Modifier
             .padding(top = 10.dp)
             .padding(horizontal = 10.dp)
@@ -612,8 +657,8 @@ private fun CircuitContinuous() {
         ) {
             Text(
                 text = stringResource(id = R.string.circuit_is_closed),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = LocalTextStyles.current.cardText.fontSize,
+                color = LocalColors.current.onSurface
             )
             Box(
                 modifier = Modifier
@@ -631,6 +676,9 @@ private fun CircuitContinuous() {
 private fun HasNoBridges() {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
@@ -643,8 +691,8 @@ private fun HasNoBridges() {
         ) {
             Text(
                 text = stringResource(id = R.string.circuit_has_no_bridges),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = LocalTextStyles.current.cardText.fontSize,
+                color = LocalColors.current.onSurface
             )
             Box(
                 modifier = Modifier
@@ -668,7 +716,8 @@ private fun StepFive(
     ) {
         Text(
             text = stringResource(id = R.string.step_5),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -733,6 +782,9 @@ private fun CycleCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column(
@@ -742,8 +794,8 @@ private fun CycleCard(
         ) {
             Text(
                 text = stringResource(id = R.string.cycle) + " ${cycleIndex+1}",
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                color = LocalColors.current.onSurface,
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .fillMaxWidth()
@@ -774,13 +826,16 @@ private fun CycleComponentCard(
     modifier: Modifier
 ) {
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column {
             Text(
                 text = stringResource(id = R.string.branch) + " $branchID",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardText.fontSize,
+                color = LocalColors.current.onSurface,
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             )
             Row(
@@ -791,8 +846,8 @@ private fun CycleComponentCard(
             ) {
                 Text(
                     text = stringResource(id = R.string.inverted) + ":",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = LocalTextStyles.current.cardText.fontSize,
+                    color = LocalColors.current.onSurface,
                     modifier = Modifier.padding(start = 10.dp, top = 10.dp)
                 )
 
@@ -832,7 +887,8 @@ private fun StepSix(
     ) {
         Text(
             text = stringResource(id = R.string.step_6),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -852,6 +908,9 @@ private fun SLECard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column(
@@ -859,8 +918,8 @@ private fun SLECard(
         ) {
             Text(
                 text = stringResource(id = R.string.SLE),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                color = LocalColors.current.onSurface,
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .fillMaxWidth()
@@ -884,7 +943,7 @@ private fun SLEText(
 ) {
     val rowCount = sle.matrix.value.rows.size
     val dividerHeight = (rowCount * 32).dp
-
+    val drawColor = LocalColors.current.onSurface
     Row(
         modifier = modifier
     ) {
@@ -895,7 +954,7 @@ private fun SLEText(
         ) {
             val height = size.height
             drawLine(
-                color = Color.Black,
+                color = drawColor,
                 start = Offset(x = size.width / 2, y = 0f),
                 end = Offset(x = size.width / 2, y = height),
                 strokeWidth = 6f,
@@ -936,8 +995,8 @@ private fun SLEText(
 
                 Text(
                     text = equation,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = LocalTextStyles.current.cardText.fontSize,
+                    color = LocalColors.current.onSurface,
                     modifier = Modifier
                         .padding(vertical = 4.dp)
                 )
@@ -994,7 +1053,8 @@ private fun StepSeven(
     ) {
         Text(
             text = stringResource(id = R.string.step_7),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.stepTitle.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -1015,6 +1075,9 @@ private fun ContourCurrentsCard(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Column(
@@ -1025,8 +1088,8 @@ private fun ContourCurrentsCard(
         ) {
             Text(
                 text = stringResource(id = R.string.loop_currents),
-                fontSize = 22.sp,
-                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = LocalTextStyles.current.cardTitle.fontSize,
+                color = LocalColors.current.onSurface,
                 modifier = Modifier.padding(start = 10.dp)
             )
             
@@ -1061,12 +1124,15 @@ private fun ContourCurrent(
 ) {
     Card(
         shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = LocalColors.current.surface
+        ),
         modifier = modifier
     ) {
         Text(
             text = "I = ${formatDoubleToString(current)} " + stringResource(id = R.string.ampere),
-            fontSize = 22.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = LocalTextStyles.current.cardText.fontSize,
+            color = LocalColors.current.onSurface,
             modifier = Modifier.padding(10.dp)
         )
     }
@@ -1084,7 +1150,8 @@ fun Result(
 
         Text(
             text = stringResource(id = R.string.result),
-            fontSize = 22.sp,
+            fontSize = LocalTextStyles.current.title.fontSize,
+            color = LocalColors.current.onBackground,
             modifier = Modifier
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
